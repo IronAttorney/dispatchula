@@ -1,7 +1,7 @@
 /**
  * The MIT License (MIT)
  *
- * Copyright (c) 2022 PeterBurgess
+ * Copyright (c) 2022 Peter Burgess
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
@@ -26,11 +26,10 @@
 #include <algorithm>
 #include <map>
 #include <typeindex>
-#include <typeinfo>
 #include <vector>
 
 
-namespace event {
+namespace dispatch {
 
 
 class EventDispatcher {
@@ -39,7 +38,7 @@ public:
 
     void subscribe(_EventSubscriberBase_* subscriber)
     {
-        const std::vector<std::type_index>& type_id_list = subscriber->_e_get_event_type_id_list();
+        const std::vector<std::type_index>& type_id_list = subscriber->_d_get_event_type_id_list();
 
         for (auto type_id : type_id_list) {
             _subscribe_to_type_id(subscriber, type_id);
@@ -48,7 +47,7 @@ public:
 
     void unsubscribe(_EventSubscriberBase_* subscriber)
     {
-        const std::vector<std::type_index>& type_id_list = subscriber->_e_get_event_type_id_list();
+        const std::vector<std::type_index>& type_id_list = subscriber->_d_get_event_type_id_list();
 
         for (auto type_id : type_id_list) {
             _unsubscribe_from_type_id(subscriber, type_id);
@@ -58,9 +57,9 @@ public:
     template<class EVENT_TYPE>
     void dispatch(const EVENT_TYPE& event)
     {
-        const auto event_subscribers_iter = m_subscriber_map.find(typeid(event));
+        const auto event_subscribers_iter = _subscriber_map.find(typeid(event));
 
-        if (event_subscribers_iter == m_subscriber_map.end()) {
+        if (event_subscribers_iter == _subscriber_map.end()) {
             return;
         }
 
@@ -76,10 +75,10 @@ private:
 
     void _subscribe_to_type_id(_EventSubscriberBase_* subscriber, std::type_index type_id)
     {
-        auto event_subscribers_iter = m_subscriber_map.find(type_id);
+        auto event_subscribers_iter = _subscriber_map.find(type_id);
 
-        if (event_subscribers_iter == m_subscriber_map.end()) {
-            m_subscriber_map.insert({type_id, {subscriber}});
+        if (event_subscribers_iter == _subscriber_map.end()) {
+            _subscriber_map.insert({type_id, {subscriber}});
         }
 
         else {
@@ -90,9 +89,9 @@ private:
 
     void _unsubscribe_from_type_id(_EventSubscriberBase_* subscriber, std::type_index type_id)
     {
-        auto event_subscribers_iter = m_subscriber_map.find(type_id);
+        auto event_subscribers_iter = _subscriber_map.find(type_id);
 
-        if (event_subscribers_iter == m_subscriber_map.end()) {
+        if (event_subscribers_iter == _subscriber_map.end()) {
             return;
         }
 
@@ -102,9 +101,9 @@ private:
         }
     }
 
-    std::map<std::type_index, std::vector<_EventSubscriberBase_*>> m_subscriber_map;
+    std::map<std::type_index, std::vector<_EventSubscriberBase_*>> _subscriber_map;
 };
 
 
-} // namespace event
+} // namespace dispatch
 

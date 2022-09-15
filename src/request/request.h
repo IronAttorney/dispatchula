@@ -1,7 +1,7 @@
 /**
  * The MIT License (MIT)
  *
- * Copyright (c) 2022 PeterBurgess
+ * Copyright (c) 2022 Peter Burgess
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
@@ -18,10 +18,19 @@
  * SOFTWARE
  */
 
+#pragma once
 
-#include "event_subscriber.h"
+
+namespace dispatch {
 
 
-namespace event {
+class _RequestBase_ {};
 
-} // namespace event
+
+template<class RETURN_TYPE = void>
+struct Request : public _RequestBase_ {
+    typedef RETURN_TYPE _RETURN_TYPE_;
+};
+
+
+} // namespace dispatch

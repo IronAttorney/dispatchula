@@ -1,7 +1,7 @@
 /**
  * The MIT License (MIT)
  *
- * Copyright (c) 2022 PeterBurgess
+ * Copyright (c) 2022 Peter Burgess
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
@@ -18,10 +18,46 @@
  * SOFTWARE
  */
 
+#pragma once
 
-#include "event_dispatcher.h"
+
+#include <typeindex>
+#include <vector>
 
 
-namespace event {
+namespace dispatch {
 
-} // namespace event
+
+class EventDispatcher;
+
+
+class _EventSubscriberBase_ {
+    friend EventDispatcher;
+
+    virtual const std::vector<std::type_index> &_d_get_event_type_id_list() = 0;
+};
+
+
+template<class EVENT_TYPE>
+class _SingleEventSubscriber_ : virtual public _EventSubscriberBase_
+{
+    friend EventDispatcher;
+
+    virtual void handle_event(const EVENT_TYPE& dispatch) = 0;
+};
+
+
+template<class ... EVENT_TYPE_LIST>
+class EventSubscriber : public _SingleEventSubscriber_<EVENT_TYPE_LIST>...
+{
+    friend EventDispatcher;
+
+    const std::vector<std::type_index>& _d_get_event_type_id_list() override {
+        return _d_event_type_id_list;
+    }
+
+    static inline const std::vector<std::type_index> _d_event_type_id_list = { typeid(EVENT_TYPE_LIST)... };
+};
+
+
+} // namespace dispatch

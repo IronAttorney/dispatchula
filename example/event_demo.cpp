@@ -19,57 +19,52 @@
  */
 
 
-#include "event_dispatcher.h"
-#include "event_subscriber.h"
+#include "event/event_dispatcher.h"
+#include "event/event_subscriber.h"
 
 #include <iostream>
 
 
-class Event {};
-class SomethingHappenedEvent {};
-class StuffOccurredEvent {};
+struct EventWithData {
+    int data;
+};
+struct SomethingHappenedEvent {};
 
 
-class MySubscriberClass : public event::EventSubscriber<Event, SomethingHappenedEvent, StuffOccurredEvent>
+class MySubscriberClass : public dispatch::EventSubscriber<EventWithData, SomethingHappenedEvent>
 {
 
 public:
 
-    void handle_event(const Event& event) override {
-        std::cout << "Handling event!" << std::endl;
+    void handle_event(const EventWithData& event) override {
+        std::cout << "Handling event with data: " << event.data << std::endl;
     }
 
     void handle_event(const SomethingHappenedEvent& event) override {
-        std::cout << "Handling something happened event!" << std::endl;
-    }
-
-    void handle_event(const StuffOccurredEvent& event) override {
-        std::cout << "Handling stuff occurred event!" << std::endl;
+        std::cout << "Handling something happened event" << std::endl;
     }
 };
 
 
 int main()
 {
-    using namespace event;
+    using namespace dispatch;
 
-    EventDispatcher dispatcher;
+    EventDispatcher event_dispatcher;
     MySubscriberClass subscriber;
-    Event event;
+
+    EventWithData event { .data = 12345 };
     SomethingHappenedEvent something_happened_event;
-    StuffOccurredEvent stuff_occurred_event;
 
-    dispatcher.subscribe(&subscriber);
+    event_dispatcher.subscribe(&subscriber);
+    std::cout << "--Event subscription--" << std::endl;
+    event_dispatcher.dispatch(event);
+    event_dispatcher.dispatch(something_happened_event);
 
-    dispatcher.dispatch(event);
-    dispatcher.dispatch(something_happened_event);
-    dispatcher.dispatch(stuff_occurred_event);
-
-    dispatcher.unsubscribe(&subscriber);
-
-    dispatcher.dispatch(event);
-    dispatcher.dispatch(something_happened_event);
-    dispatcher.dispatch(stuff_occurred_event);
+    event_dispatcher.unsubscribe(&subscriber);
+    std::cout << std::endl << "--Event unsubscription--" << std::endl;
+    event_dispatcher.dispatch(event);
+    event_dispatcher.dispatch(something_happened_event);
 
     return 0;
 }
