@@ -1,27 +1,23 @@
 cmake_minimum_required(VERSION 3.22)
-project(DispatcherDemo)
+
 
 set(CMAKE_CXX_STANDARD 23)
 
 
-add_compile_options(-std=c++23)
+add_library(
+        dispatchula
 
-
-SET(CMAKE_CXX_FLAGS)
-
-
-add_executable(
-        DispatcherDemo
-
-        # Uncomment the example you wish to run
-#        example/combined_demo.cpp
-#        example/event_demo.cpp
-        example/request_demo.cpp
+        INTERFACE
+        src/event/event_dispatcher.h
+        src/event/event_subscriber.h
+        src/request/request.h
+        src/request/request_dispatcher.h
+        src/request/request_subscriber.h
 )
 
 target_include_directories(
-        DispatcherDemo
+        dispatchula
 
-        PUBLIC
-        src
+        INTERFACE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
