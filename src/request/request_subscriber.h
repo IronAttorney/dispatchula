@@ -21,9 +21,11 @@
 #pragma once
 
 
+#include "concepts/subscriber_concepts.h"
 #include "request.h"
 
 
+#include <concepts>
 #include <optional>
 #include <typeindex>
 #include <vector>
@@ -33,10 +35,6 @@ namespace dispatch {
 
 
 class RequestDispatcher;
-
-
-template<class T>
-concept is_void = requires { std::is_void<T>::value; };
 
 
 class _RequestSubscriberBase_ {
@@ -58,7 +56,7 @@ class _SingleRequestSubscriber_ : virtual public _RequestSubscriberBase_
 };
 
 
-template<class ... REQUEST_TYPE_LIST>
+template<_are_unique_types_ ... REQUEST_TYPE_LIST>
 class RequestSubscriber : public _SingleRequestSubscriber_<REQUEST_TYPE_LIST>...
 {
     friend RequestDispatcher;

@@ -21,6 +21,8 @@
 #pragma once
 
 
+#include "concepts/subscriber_concepts.h"
+
 #include <typeindex>
 #include <vector>
 
@@ -47,7 +49,7 @@ class _SingleEventSubscriber_ : virtual public _EventSubscriberBase_
 };
 
 
-template<class ... EVENT_TYPE_LIST>
+template<_are_unique_types_ ... EVENT_TYPE_LIST>
 class EventSubscriber : public _SingleEventSubscriber_<EVENT_TYPE_LIST>...
 {
     friend EventDispatcher;
