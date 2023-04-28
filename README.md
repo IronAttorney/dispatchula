@@ -26,6 +26,10 @@ Any class wishing to handle dispatched events must be derived from this class
 and must include all event types it wishes to handle in the template parameter
 list for `EventSubscriber`.
 
+An `EventSubscriber` cannot repeat template argument types as this would equate to
+subscribing to the same event multiple times. Aliased types are treated as repeated
+types.
+
 The derived subscriber class will then need to implement one handler function called
 `handle_event` per event type in the template parameter list `EVENT_TYPE_LIST`
 for the `EventSubscriber` base class.
@@ -84,6 +88,10 @@ type.
 Any class wishing to handle dispatched request must be derived from this class
 and must include all request types it wishes to handle in the template parameter
 list for `RequestSubscriber`.
+
+A `RequestSubscriber` cannot repeat template argument types as this would equate to
+subscribing to the same event multiple times. Aliased types are treated as repeated
+types.
 
 The derived subscriber class will then need to implement one handler function called
 `handle_request` per request type in the template parameter list `REQUEST_TYPE_LIST`
