@@ -10,14 +10,14 @@ add_executable(
         DispatcherDemo
 
         # Uncomment the example you wish to run
-        example/combined_demo.cpp
-#        example/event_demo.cpp
-#        example/request_demo.cpp
+        combined_demo.cpp
+#        event_demo.cpp
+#        request_demo.cpp
 )
 
 target_include_directories(
         DispatcherDemo
 
         PUBLIC
-        src
+        ../src
 )
