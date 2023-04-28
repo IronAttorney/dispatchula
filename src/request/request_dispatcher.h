@@ -97,7 +97,7 @@ public:
     }
 
     template<class REQUEST_TYPE> requires std::is_void<typename REQUEST_TYPE::_RETURN_TYPE_>::value
-    void dispatch(const REQUEST_TYPE& request)
+    void dispatch(const REQUEST_TYPE& request) const
     {
         const auto request_subscriber_iter = _subscriber_map.find(typeid(request));
 
@@ -112,7 +112,7 @@ public:
     }
 
     template<_is_optional_ REQUEST_TYPE>
-    auto dispatch(const REQUEST_TYPE& request) -> typename REQUEST_TYPE::_RETURN_TYPE_
+    auto dispatch(const REQUEST_TYPE& request) const -> typename REQUEST_TYPE::_RETURN_TYPE_
     {
         const auto request_subscriber_iter = _subscriber_map.find(typeid(request));
 
@@ -127,7 +127,7 @@ public:
     }
 
     template<_is_raw_or_smart_pointer_ REQUEST_TYPE>
-    auto dispatch(const REQUEST_TYPE& request) -> typename REQUEST_TYPE::_RETURN_TYPE_
+    auto dispatch(const REQUEST_TYPE& request) const -> typename REQUEST_TYPE::_RETURN_TYPE_
     {
         const auto request_subscriber_iter = _subscriber_map.find(typeid(request));
 
@@ -142,7 +142,7 @@ public:
     }
 
     template<class REQUEST_TYPE>
-    auto dispatch(const REQUEST_TYPE& request) -> std::optional<typename REQUEST_TYPE::_RETURN_TYPE_>
+    auto dispatch(const REQUEST_TYPE& request) const -> std::optional<typename REQUEST_TYPE::_RETURN_TYPE_>
     {
         const auto request_subscriber_iter = _subscriber_map.find(typeid(request));
 

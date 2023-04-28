@@ -55,7 +55,7 @@ public:
     }
 
     template<class EVENT_TYPE>
-    void dispatch(const EVENT_TYPE& event)
+    void dispatch(const EVENT_TYPE& event) const
     {
         const auto event_subscribers_iter = _subscriber_map.find(typeid(event));
 
