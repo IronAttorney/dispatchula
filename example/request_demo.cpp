@@ -31,9 +31,12 @@ struct RequestWithData : public dispatch::Request<> {
 };
 using DoSomethingRequest = dispatch::Request<>;
 struct GiveMeStuffRequest : public dispatch::Request<int> {};
+struct GiveMeStuffIfYouLikeRequest : public dispatch::Request<std::optional<int>> {};
+struct GiveMePointersRequest : public dispatch::Request<std::shared_ptr<int>> {};
+struct GiveMeRawPointersRequest : public dispatch::Request<float*> {};
 
 
-class MySubscriberClass : public dispatch::RequestSubscriber<RequestWithData, DoSomethingRequest, GiveMeStuffRequest>
+class MySubscriberClass : public dispatch::RequestSubscriber<RequestWithData, DoSomethingRequest, GiveMeStuffRequest, GiveMeStuffIfYouLikeRequest, GiveMePointersRequest, GiveMeRawPointersRequest>
 {
 
 public:
@@ -50,6 +53,21 @@ public:
         std::cout << "Handling give me stuff request and returning `7`" << std::endl;
         return 7;
     }
+
+    std::optional<int> handle_request(const GiveMeStuffIfYouLikeRequest& request) override {
+        std::cout << "Didn't feel like handling give me stuff if you like request and returning `std::nullptr`" << std::endl;
+        return std::nullopt;
+    }
+
+    std::shared_ptr<int> handle_request(const GiveMePointersRequest& request) override {
+        std::cout << "Didn't feel like handling give me pointers request and returning `nullptr`" << std::endl;
+        return nullptr;
+    }
+
+    float* handle_request(const GiveMeRawPointersRequest& request) override {
+        std::cout << "Didn't feel like handling give me raw pointers request and returning `nullptr`" << std::endl;
+        return nullptr;
+    }
 };
 
 
@@ -63,36 +81,54 @@ int main()
     RequestWithData request { .data = 67890 };
     DoSomethingRequest do_something_request;
     GiveMeStuffRequest give_me_stuff_request;
+    GiveMeStuffIfYouLikeRequest give_me_stuff_if_you_like_request;
+    GiveMePointersRequest give_me_pointers_request;
+    GiveMeRawPointersRequest give_me_raw_pointers_request;
 
     request_dispatcher.subscribe(&subscriber);
     std::cout << std::endl << "--General request subscription--" << std::endl;
     request_dispatcher.dispatch(request);
     request_dispatcher.dispatch(do_something_request);
     request_dispatcher.dispatch(give_me_stuff_request);
+    request_dispatcher.dispatch(give_me_stuff_if_you_like_request);
+    request_dispatcher.dispatch(give_me_pointers_request);
+    request_dispatcher.dispatch(give_me_raw_pointers_request);
 
     request_dispatcher.unsubscribe(&subscriber);
     std::cout << std::endl << "--General request unsubscription--" << std::endl;
     request_dispatcher.dispatch(request);
     request_dispatcher.dispatch(do_something_request);
     request_dispatcher.dispatch(give_me_stuff_request);
+    request_dispatcher.dispatch(give_me_stuff_if_you_like_request);
+    request_dispatcher.dispatch(give_me_pointers_request);
+    request_dispatcher.dispatch(give_me_raw_pointers_request);
 
-    request_dispatcher.subscribe<RequestWithData, GiveMeStuffRequest>(&subscriber);
-    std::cout << std::endl << "--Specific request `MyRequest` and `GiveMeStuffRequest` subscription--" << std::endl;
+    request_dispatcher.subscribe<RequestWithData, GiveMeStuffRequest, GiveMePointersRequest>(&subscriber);
+    std::cout << std::endl << "--Specific request `MyRequest`, `GiveMeStuffRequest` and `GiveMePointersRequest` subscription--" << std::endl;
     request_dispatcher.dispatch(request);
     request_dispatcher.dispatch(do_something_request);
     request_dispatcher.dispatch(give_me_stuff_request);
+    request_dispatcher.dispatch(give_me_stuff_if_you_like_request);
+    request_dispatcher.dispatch(give_me_pointers_request);
+    request_dispatcher.dispatch(give_me_raw_pointers_request);
 
     request_dispatcher.subscribe<DoSomethingRequest>(&subscriber);
     std::cout << std::endl << "--Specific request `DoSomethingRequest`` subscription--" << std::endl;
     request_dispatcher.dispatch(request);
     request_dispatcher.dispatch(do_something_request);
     request_dispatcher.dispatch(give_me_stuff_request);
+    request_dispatcher.dispatch(give_me_stuff_if_you_like_request);
+    request_dispatcher.dispatch(give_me_pointers_request);
+    request_dispatcher.dispatch(give_me_raw_pointers_request);
 
     request_dispatcher.unsubscribe<RequestWithData>(&subscriber);
     std::cout << std::endl << "--Specific request `Request` unsubscription--" << std::endl;
     request_dispatcher.dispatch(request);
     request_dispatcher.dispatch(do_something_request);
     request_dispatcher.dispatch(give_me_stuff_request);
+    request_dispatcher.dispatch(give_me_stuff_if_you_like_request);
+    request_dispatcher.dispatch(give_me_pointers_request);
+    request_dispatcher.dispatch(give_me_raw_pointers_request);
 
     return 0;
 }

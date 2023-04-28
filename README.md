@@ -98,8 +98,17 @@ The derived subscriber class will then need to implement one handler function ca
 for the `RequestSubscriber` base class.
 
 Each handler function takes one argument of the given request type, and has a return
-type of either `void` or the type defined in the given request's template parameter
-`RESULT_TYPE`.
+type determined by the request's template parameter `RESULT_TYPE`. For `RESULT_TYPE`
+of `void`, `std::optional<T>`, `std::shared_ptr<T>`, `std::unique_ptr<T>` or a raw
+pointer, return type is the same as `RESULT_TYPE`. For all other cases, the return
+type wraps `RESULT_TYPE` as `std::optional<RESULT_TYPE>`. To clarify:
+
+- If `RESULT_TYPE` == `void`, return type == `void`
+- If `RESULT_TYPE` == `std::optional<T>`, return type == `std::optional<T>`
+- If `RESULT_TYPE` == `std::shared_ptr<T>`, return type == `std::shared_ptr<T>`
+- If `RESULT_TYPE` == `std::unique_ptr<T>`, return type == `std::unique_ptr<T>`
+- If `RESULT_TYPE` == `T*`, return type == `T*`
+- Else, return type == `std::optional<RESULT_TYPE>`
 
 ### Request Dispatcher
 
@@ -130,7 +139,5 @@ Call `request_dispatcher.dispatch(request);` to dispatch a request to be handled
 currently subscribed to the given request type.
 
 Call `auto result = request_dispatcher.dispatch(request);` or similar if you expect this request
-handler function to result in a return type. `auto` == `std::optional<RESULT_TYPE>` where
-`RESULT_TYPE` is the template parameter of the given request type as detailed above. If no object
-is subscribed to a given request type with a non-void return type at the time that the request is
-dispatched, `std::nullopt` is returned.
+handler function to result in a return type. See "Request Subscriber" section above for details
+of the expected return type.

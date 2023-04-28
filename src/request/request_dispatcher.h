@@ -111,6 +111,36 @@ public:
         sub_subscriber->handle_request(request);
     }
 
+    template<_is_optional_ REQUEST_TYPE>
+    auto dispatch(const REQUEST_TYPE& request) -> typename REQUEST_TYPE::_RETURN_TYPE_
+    {
+        const auto request_subscriber_iter = _subscriber_map.find(typeid(request));
+
+        if (request_subscriber_iter == _subscriber_map.end()) {
+            return std::nullopt;
+        }
+
+        const auto& subscriber = request_subscriber_iter->second;
+
+        auto sub_subscriber = dynamic_cast<_SingleRequestSubscriber_<REQUEST_TYPE>*>(subscriber);
+        return sub_subscriber->handle_request(request);
+    }
+
+    template<_is_raw_or_smart_pointer_ REQUEST_TYPE>
+    auto dispatch(const REQUEST_TYPE& request) -> typename REQUEST_TYPE::_RETURN_TYPE_
+    {
+        const auto request_subscriber_iter = _subscriber_map.find(typeid(request));
+
+        if (request_subscriber_iter == _subscriber_map.end()) {
+            return nullptr;
+        }
+
+        const auto& subscriber = request_subscriber_iter->second;
+
+        auto sub_subscriber = dynamic_cast<_SingleRequestSubscriber_<REQUEST_TYPE>*>(subscriber);
+        return sub_subscriber->handle_request(request);
+    }
+
     template<class REQUEST_TYPE>
     auto dispatch(const REQUEST_TYPE& request) -> std::optional<typename REQUEST_TYPE::_RETURN_TYPE_>
     {

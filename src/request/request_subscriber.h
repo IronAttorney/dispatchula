@@ -26,6 +26,7 @@
 
 
 #include <concepts>
+#include <memory>
 #include <optional>
 #include <typeindex>
 #include <vector>
@@ -49,8 +50,10 @@ class _SingleRequestSubscriber_ : virtual public _RequestSubscriberBase_
 {
     friend RequestDispatcher;
 
-    using RETURN_TYPE = typename std::conditional<std::is_void<typename REQUEST_TYPE::_RETURN_TYPE_>::value,
-                                                  void, std::optional<typename REQUEST_TYPE::_RETURN_TYPE_>>::type;
+    using RETURN_TYPE = typename std::conditional<
+            _is_unwrapped_request_return_type_v_<typename REQUEST_TYPE::_RETURN_TYPE_>,
+            typename REQUEST_TYPE::_RETURN_TYPE_,
+            std::optional<typename REQUEST_TYPE::_RETURN_TYPE_>>::type;
 
     virtual RETURN_TYPE handle_request(const REQUEST_TYPE& dispatch) = 0;
 };
