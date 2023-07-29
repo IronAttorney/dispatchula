@@ -92,7 +92,7 @@ public:
         const std::vector<std::type_index> _d_request_type_id_list = { typeid(REQUEST_TYPE_LIST)... };
 
         for (auto type_id : _d_request_type_id_list) {
-            _try_subscribe_to_type_id(subscriber, type_id);
+            _unsubscribe_from_type_id(subscriber, type_id);
         }
     }
 
@@ -111,7 +111,7 @@ public:
         sub_subscriber->handle_request(request);
     }
 
-    template<_is_optional_ REQUEST_TYPE>
+    template<class REQUEST_TYPE> requires _is_optional_<typename REQUEST_TYPE::_RETURN_TYPE_>
     auto dispatch(const REQUEST_TYPE& request) const -> typename REQUEST_TYPE::_RETURN_TYPE_
     {
         const auto request_subscriber_iter = _subscriber_map.find(typeid(request));
@@ -126,7 +126,7 @@ public:
         return sub_subscriber->handle_request(request);
     }
 
-    template<_is_raw_or_smart_pointer_ REQUEST_TYPE>
+    template<class REQUEST_TYPE> requires _is_raw_or_smart_pointer_<typename REQUEST_TYPE::_RETURN_TYPE_>
     auto dispatch(const REQUEST_TYPE& request) const -> typename REQUEST_TYPE::_RETURN_TYPE_
     {
         const auto request_subscriber_iter = _subscriber_map.find(typeid(request));
