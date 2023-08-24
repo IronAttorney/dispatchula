@@ -49,7 +49,7 @@ class _SingleEventSubscriber_ : virtual public _EventSubscriberBase_
 };
 
 
-template<_are_unique_types_ ... EVENT_TYPE_LIST>
+template<class ... EVENT_TYPE_LIST> requires _are_unique_types_<EVENT_TYPE_LIST...>
 class EventSubscriber : public _SingleEventSubscriber_<EVENT_TYPE_LIST>...
 {
     friend EventDispatcher;

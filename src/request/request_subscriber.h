@@ -59,7 +59,7 @@ class _SingleRequestSubscriber_ : virtual public _RequestSubscriberBase_
 };
 
 
-template<_are_unique_types_ ... REQUEST_TYPE_LIST>
+template<class ... REQUEST_TYPE_LIST> requires _are_unique_types_<REQUEST_TYPE_LIST...>
 class RequestSubscriber : public _SingleRequestSubscriber_<REQUEST_TYPE_LIST>...
 {
     friend RequestDispatcher;
