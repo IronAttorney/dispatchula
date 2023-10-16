@@ -101,7 +101,7 @@ private:
         }
     }
 
-    std::map<std::type_index, std::vector<_EventSubscriberBase_*>> _subscriber_map;
+    std::map<std::type_index, std::vector<_EventSubscriberBase_*>> _subscriber_map {};
 };
 
 

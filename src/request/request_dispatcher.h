@@ -169,7 +169,7 @@ private:
         _subscriber_map.erase(type_id);
     }
 
-    std::map<std::type_index, _RequestSubscriberBase_*> _subscriber_map;
+    std::map<std::type_index, _RequestSubscriberBase_*> _subscriber_map {};
 };
 
 
