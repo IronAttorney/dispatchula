@@ -45,6 +45,12 @@ public:
         }
     }
 
+    template<class EVENT_TYPE, class SINGLE_EVENT_SUBSCRIBER_TYPE> requires std::is_base_of_v<_SingleEventSubscriber_<EVENT_TYPE>, SINGLE_EVENT_SUBSCRIBER_TYPE>
+    void subscribe(SINGLE_EVENT_SUBSCRIBER_TYPE* subscriber)
+    {
+        _subscribe_to_type_id(subscriber, typeid(EVENT_TYPE));
+    }
+
     void unsubscribe(_EventSubscriberBase_* subscriber)
     {
         const std::vector<std::type_index>& type_id_list = subscriber->_d_get_event_type_id_list();
@@ -52,6 +58,12 @@ public:
         for (auto type_id : type_id_list) {
             _unsubscribe_from_type_id(subscriber, type_id);
         }
+    }
+
+    template<class EVENT_TYPE, class SINGLE_EVENT_SUBSCRIBER_TYPE> requires std::is_base_of_v<_SingleEventSubscriber_<EVENT_TYPE>, SINGLE_EVENT_SUBSCRIBER_TYPE>
+    void unsubscribe(SINGLE_EVENT_SUBSCRIBER_TYPE* subscriber)
+    {
+        _unsubscribe_from_type_id(subscriber, typeid(EVENT_TYPE));
     }
 
     template<class EVENT_TYPE>
