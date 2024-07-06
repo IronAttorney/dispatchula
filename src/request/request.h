@@ -29,7 +29,7 @@ class _RequestBase_ {};
 
 template<class RETURN_TYPE = void>
 struct Request : public _RequestBase_ {
-    typedef RETURN_TYPE _RETURN_TYPE_;
+    using _RETURN_TYPE_ = RETURN_TYPE;
 };
 
 

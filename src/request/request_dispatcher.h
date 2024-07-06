@@ -111,6 +111,21 @@ public:
         sub_subscriber->handle_request(request);
     }
 
+    template<class REQUEST_TYPE> requires _is_any_pointer_<typename REQUEST_TYPE::_RETURN_TYPE_>
+    auto dispatch(const REQUEST_TYPE& request) const -> typename REQUEST_TYPE::_RETURN_TYPE_
+    {
+        const auto request_subscriber_iter = _subscriber_map.find(typeid(request));
+
+        if (request_subscriber_iter == _subscriber_map.end()) {
+            return nullptr;
+        }
+
+        const auto& subscriber = request_subscriber_iter->second;
+
+        auto sub_subscriber = dynamic_cast<_SingleRequestSubscriber_<REQUEST_TYPE>*>(subscriber);
+        return sub_subscriber->handle_request(request);
+    }
+
     template<class REQUEST_TYPE> requires _is_optional_<typename REQUEST_TYPE::_RETURN_TYPE_>
     auto dispatch(const REQUEST_TYPE& request) const -> typename REQUEST_TYPE::_RETURN_TYPE_
     {
@@ -126,22 +141,7 @@ public:
         return sub_subscriber->handle_request(request);
     }
 
-    template<class REQUEST_TYPE> requires _is_raw_or_smart_pointer_<typename REQUEST_TYPE::_RETURN_TYPE_>
-    auto dispatch(const REQUEST_TYPE& request) const -> typename REQUEST_TYPE::_RETURN_TYPE_
-    {
-        const auto request_subscriber_iter = _subscriber_map.find(typeid(request));
-
-        if (request_subscriber_iter == _subscriber_map.end()) {
-            return nullptr;
-        }
-
-        const auto& subscriber = request_subscriber_iter->second;
-
-        auto sub_subscriber = dynamic_cast<_SingleRequestSubscriber_<REQUEST_TYPE>*>(subscriber);
-        return sub_subscriber->handle_request(request);
-    }
-
-    template<class REQUEST_TYPE>
+    template<class REQUEST_TYPE> requires _is_value_<typename REQUEST_TYPE::_RETURN_TYPE_>
     auto dispatch(const REQUEST_TYPE& request) const -> std::optional<typename REQUEST_TYPE::_RETURN_TYPE_>
     {
         const auto request_subscriber_iter = _subscriber_map.find(typeid(request));

@@ -45,15 +45,14 @@ class _RequestSubscriberBase_ {
 };
 
 
-template<class REQUEST_TYPE>
+template<class REQUEST_TYPE> requires _is_request_return_type_<typename REQUEST_TYPE::_RETURN_TYPE_>
 class _SingleRequestSubscriber_ : virtual public _RequestSubscriberBase_
 {
     friend RequestDispatcher;
 
     using RETURN_TYPE = typename std::conditional<
-            _is_unwrapped_request_return_type_v_<typename REQUEST_TYPE::_RETURN_TYPE_>,
-            typename REQUEST_TYPE::_RETURN_TYPE_,
-            std::optional<typename REQUEST_TYPE::_RETURN_TYPE_>>::type;
+            _is_non_value_request_return_type_v_<typename REQUEST_TYPE::_RETURN_TYPE_>,
+                    typename REQUEST_TYPE::_RETURN_TYPE_, std::optional<typename REQUEST_TYPE::_RETURN_TYPE_> >::type;
 
     virtual RETURN_TYPE handle_request(const REQUEST_TYPE& dispatch) = 0;
 };
