@@ -28,11 +28,17 @@ concept _are_unique_types_ = (_are_unique_types_v_<TYPE_LIST...>);
 /** Request Return Types Traits */
 
 template<class T>
-constexpr bool _is_non_value_request_return_type_v_ = ( std::is_void<T>::value ||
-                                                        std::is_pointer<T>::value ||
-                                                        std::same_as<T, std::shared_ptr<typename T::element_type>> ||
-                                                        std::same_as<T, std::unique_ptr<typename T::element_type>> ||
-                                                        std::same_as<T, std::optional<typename T::element_type>> );
+struct _is_smart_wrapper_t_ : std::false_type {};
+template<class T>
+struct _is_smart_wrapper_t_<std::optional<T>> : std::true_type {};
+template<class T>
+struct _is_smart_wrapper_t_<std::shared_ptr<T>> : std::true_type {};
+template<class T>
+struct _is_smart_wrapper_t_<std::unique_ptr<T>> : std::true_type {};
+
+template<class T>
+constexpr bool _is_non_value_request_return_type_v_ = (std::is_void<T>::value || std::is_pointer<T>::value || _is_smart_wrapper_t_<T>::value);
+
 
 /** Type Concepts */
 
@@ -67,7 +73,7 @@ template <class T>
 concept _is_value_ = (!_is_smart_wrapper_<T> && !_is_raw_pointer_<T> && !_is_raw_reference_<T>);
 
 template<class T>
-concept _is_request_return_type_ = ( ( _is_smart_wrapper_<T> || _is_raw_pointer_<T> ) && !_is_raw_reference_<T> );
+concept _is_request_return_type_ = ( _is_smart_wrapper_<T> || _is_raw_pointer_<T> || std::is_void<T>::value || !_is_raw_reference_<T> );
 
 
 } // dispatch
