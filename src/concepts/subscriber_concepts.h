@@ -5,6 +5,7 @@
 #pragma once
 
 
+#include <expected>
 #include <memory>
 #include <optional>
 #include <type_traits>
@@ -35,9 +36,11 @@ template<class T>
 struct _is_smart_wrapper_t_<std::shared_ptr<T>> : std::true_type {};
 template<class T>
 struct _is_smart_wrapper_t_<std::unique_ptr<T>> : std::true_type {};
+//template<class T, class E>
+//struct _is_smart_wrapper_t_<std::expected<T, E>> : std::true_type {};
 
 template<class T>
-constexpr bool _is_non_value_request_return_type_v_ = (std::is_void<T>::value || std::is_pointer<T>::value || _is_smart_wrapper_t_<T>::value);
+struct _is_non_value_request_return_type_t_ : std::disjunction<std::is_void<T>, std::is_pointer<T>, _is_smart_wrapper_t_<T>> {};
 
 
 /** Type Concepts */
@@ -57,14 +60,14 @@ concept _is_unique_pointer_ = std::same_as<T, std::unique_ptr<typename T::elemen
 template <class T>
 concept _is_optional_ = std::same_as<T, std::optional<typename T::value_type>>;
 
+//template <class T>
+//concept _is_expected_ = std::same_as<T, std::expected<typename T::value_type, typename T::error_type>>;
+
 template <class T>
 concept _is_smart_pointer_ = (_is_shared_pointer_<T> || _is_unique_pointer_<T>);
 
 template <class T>
-concept _is_smart_wrapper_ = (_is_smart_pointer_<T> || _is_optional_<T>);
-
-template <class T>
-concept _is_non_unique_pointer_ = (_is_raw_pointer_<T> || _is_shared_pointer_<T>);
+concept _is_smart_wrapper_ = (_is_smart_pointer_<T> || _is_optional_<T> /**|| _is_expected_<T>**/);
 
 template <class T>
 concept _is_any_pointer_ = (_is_raw_pointer_<T> || _is_smart_pointer_<T>);

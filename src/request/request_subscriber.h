@@ -42,6 +42,9 @@ class _RequestSubscriberBase_ {
     friend RequestDispatcher;
 
     virtual const std::vector<std::type_index> &_d_get_request_type_id_list() = 0;
+
+public:
+    virtual ~_RequestSubscriberBase_() = default;
 };
 
 
@@ -50,11 +53,12 @@ class _SingleRequestSubscriber_ : virtual public _RequestSubscriberBase_
 {
     friend RequestDispatcher;
 
-    using RETURN_TYPE = typename std::conditional<
-            _is_non_value_request_return_type_v_<typename REQUEST_TYPE::_RETURN_TYPE_>,
-                    typename REQUEST_TYPE::_RETURN_TYPE_, std::optional<typename REQUEST_TYPE::_RETURN_TYPE_> >::type;
+    using RETURN_TYPE = typename REQUEST_TYPE::_RETURN_TYPE_;
 
     virtual RETURN_TYPE handle_request(const REQUEST_TYPE& dispatch) = 0;
+
+public:
+    virtual ~_SingleRequestSubscriber_() = default;
 };
 
 
@@ -68,6 +72,9 @@ class RequestSubscriber : public _SingleRequestSubscriber_<REQUEST_TYPE_LIST>...
     }
 
     static inline const std::vector<std::type_index> _d_request_type_id_list = {typeid(REQUEST_TYPE_LIST)... };
+
+public:
+    virtual ~RequestSubscriber() = default;
 };
 
 
