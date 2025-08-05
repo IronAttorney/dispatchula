@@ -26,46 +26,72 @@
 #include <iostream>
 
 
+enum class ErrorMessage
+{
+    NoRequestSubscriberFound = -1,
+    EverythingIsOnFire = 1,
+};
+
+
 struct RequestWithData : public dispatch::Request<> {
     int data;
 };
 using DoSomethingRequest = dispatch::Request<>;
 struct GiveMeStuffRequest : public dispatch::Request<int> {};
 struct GiveMeStuffIfYouLikeRequest : public dispatch::Request<std::optional<int>> {};
+struct GiveMeExpectedStuffOrErrorRequest : public dispatch::Request<std::expected<int, ErrorMessage>> {};
 struct GiveMePointersRequest : public dispatch::Request<std::shared_ptr<int>> {};
+struct GiveMeUniquePointersRequest : public dispatch::Request<std::unique_ptr<int>> {};
 struct GiveMeRawPointersRequest : public dispatch::Request<float*> {};
 
 
-class MySubscriberClass : public dispatch::RequestSubscriber<RequestWithData, DoSomethingRequest, GiveMeStuffRequest, GiveMeStuffIfYouLikeRequest, GiveMePointersRequest, GiveMeRawPointersRequest>
+class MySubscriberClass : public dispatch::RequestSubscriber<RequestWithData,
+                                                             DoSomethingRequest,
+                                                             GiveMeStuffRequest,
+                                                             GiveMeStuffIfYouLikeRequest,
+                                                             GiveMeExpectedStuffOrErrorRequest,
+                                                             GiveMePointersRequest,
+                                                             GiveMeUniquePointersRequest,
+                                                             GiveMeRawPointersRequest>
 {
 
 public:
 
     void handle_request(const RequestWithData& request) override {
-        std::cout << "Handling request with data: " << request.data << std::endl;
+        std::cout << "Handling `RequestWithData`: " << request.data << std::endl;
     }
 
     void handle_request(const DoSomethingRequest& request) override {
-        std::cout << "Handling do something request" << std::endl;
+        std::cout << "Handling `DoSomethingRequest`" << std::endl;
     }
 
     std::optional<int> handle_request(const GiveMeStuffRequest& request) override {
-        std::cout << "Handling give me stuff request and returning `7`" << std::endl;
+        std::cout << "Handling `GiveMeStuffRequest` and returning `7`" << std::endl;
         return 7;
     }
 
     std::optional<int> handle_request(const GiveMeStuffIfYouLikeRequest& request) override {
-        std::cout << "Didn't feel like handling give me stuff if you like request and returning `std::nullptr`" << std::endl;
+        std::cout << "Didn't feel like handling `GiveMeStuffIfYouLikeRequest` and returning `std::nullptr`" << std::endl;
         return std::nullopt;
     }
 
+    std::expected<int, ErrorMessage> handle_request(const GiveMeExpectedStuffOrErrorRequest& request) override {
+        std::cout << "Didn't feel like handling `GiveMeExpectedStuffOrErrorRequest` and returning an `ErrorMessage`" << std::endl;
+        return std::unexpected{ ErrorMessage::EverythingIsOnFire };
+    }
+
     std::shared_ptr<int> handle_request(const GiveMePointersRequest& request) override {
-        std::cout << "Didn't feel like handling give me pointers request and returning `nullptr`" << std::endl;
+        std::cout << "Didn't feel like handling `GiveMePointersRequest` and returning `nullptr`" << std::endl;
         return nullptr;
     }
 
+    std::unique_ptr<int> handle_request(const GiveMeUniquePointersRequest& request) override {
+        std::cout << "Handling `GiveMeUniquePointersRequest` and returning a pointer to `9`" << std::endl;
+        return std::make_unique<int>(9);
+    }
+
     float* handle_request(const GiveMeRawPointersRequest& request) override {
-        std::cout << "Didn't feel like handling give me raw pointers request and returning `nullptr`" << std::endl;
+        std::cout << "Didn't feel like handling `GiveMeRawPointersRequest` and returning `nullptr`" << std::endl;
         return nullptr;
     }
 };
@@ -82,7 +108,9 @@ int main()
     DoSomethingRequest do_something_request;
     GiveMeStuffRequest give_me_stuff_request;
     GiveMeStuffIfYouLikeRequest give_me_stuff_if_you_like_request;
+    GiveMeExpectedStuffOrErrorRequest give_me_expected_stuff_or_error_request;
     GiveMePointersRequest give_me_pointers_request;
+    GiveMeUniquePointersRequest give_me_unique_pointers_request;
     GiveMeRawPointersRequest give_me_raw_pointers_request;
 
     request_dispatcher.subscribe(&subscriber);
@@ -91,7 +119,9 @@ int main()
     request_dispatcher.dispatch(do_something_request);
     request_dispatcher.dispatch(give_me_stuff_request);
     request_dispatcher.dispatch(give_me_stuff_if_you_like_request);
+    request_dispatcher.dispatch(give_me_expected_stuff_or_error_request);
     request_dispatcher.dispatch(give_me_pointers_request);
+    request_dispatcher.dispatch(give_me_unique_pointers_request);
     request_dispatcher.dispatch(give_me_raw_pointers_request);
 
     request_dispatcher.unsubscribe(&subscriber);
@@ -100,7 +130,9 @@ int main()
     request_dispatcher.dispatch(do_something_request);
     request_dispatcher.dispatch(give_me_stuff_request);
     request_dispatcher.dispatch(give_me_stuff_if_you_like_request);
+    request_dispatcher.dispatch(give_me_expected_stuff_or_error_request);
     request_dispatcher.dispatch(give_me_pointers_request);
+    request_dispatcher.dispatch(give_me_unique_pointers_request);
     request_dispatcher.dispatch(give_me_raw_pointers_request);
 
     request_dispatcher.subscribe<RequestWithData, GiveMeStuffRequest, GiveMePointersRequest>(&subscriber);
@@ -109,7 +141,9 @@ int main()
     request_dispatcher.dispatch(do_something_request);
     request_dispatcher.dispatch(give_me_stuff_request);
     request_dispatcher.dispatch(give_me_stuff_if_you_like_request);
+    request_dispatcher.dispatch(give_me_expected_stuff_or_error_request);
     request_dispatcher.dispatch(give_me_pointers_request);
+    request_dispatcher.dispatch(give_me_unique_pointers_request);
     request_dispatcher.dispatch(give_me_raw_pointers_request);
 
     request_dispatcher.subscribe<DoSomethingRequest>(&subscriber);
@@ -118,7 +152,9 @@ int main()
     request_dispatcher.dispatch(do_something_request);
     request_dispatcher.dispatch(give_me_stuff_request);
     request_dispatcher.dispatch(give_me_stuff_if_you_like_request);
+    request_dispatcher.dispatch(give_me_expected_stuff_or_error_request);
     request_dispatcher.dispatch(give_me_pointers_request);
+    request_dispatcher.dispatch(give_me_unique_pointers_request);
     request_dispatcher.dispatch(give_me_raw_pointers_request);
 
     request_dispatcher.unsubscribe<RequestWithData>(&subscriber);
@@ -127,7 +163,9 @@ int main()
     request_dispatcher.dispatch(do_something_request);
     request_dispatcher.dispatch(give_me_stuff_request);
     request_dispatcher.dispatch(give_me_stuff_if_you_like_request);
+    request_dispatcher.dispatch(give_me_expected_stuff_or_error_request);
     request_dispatcher.dispatch(give_me_pointers_request);
+    request_dispatcher.dispatch(give_me_unique_pointers_request);
     request_dispatcher.dispatch(give_me_raw_pointers_request);
 
     return 0;

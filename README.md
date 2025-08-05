@@ -59,6 +59,7 @@ is dispatched.
 Call `event_dispatcher.dispatch(event);` to dispatch an event to be handled by all objects
 currently subscribed to the given event type.
 
+
 ## Requests
 
 ### Examples
@@ -99,11 +100,17 @@ for the `RequestSubscriber` base class.
 
 Each handler function takes one argument of the given request type, and has a return
 type determined by the request's template parameter `RESULT_TYPE`. For `RESULT_TYPE`
-of `void`, `std::optional<T>`, `std::shared_ptr<T>`, `std::unique_ptr<T>` or a raw
-pointer, return type is the same as `RESULT_TYPE`. For all other cases, the return
-type wraps `RESULT_TYPE` as `std::optional<RESULT_TYPE>`. To clarify:
+of `void`, `std::expected<T, E>`, `std::optional<T>`, `std::shared_ptr<T>`,
+`std::unique_ptr<T>` or a raw pointer, return type is the same as `RESULT_TYPE`. For
+all other cases, the return type wraps `RESULT_TYPE` as `std::optional<RESULT_TYPE>`.
+
+Side note: If using `RESULT_TYPE` == `std::expected<T, E>`, `E` may not be a
+`std::string` or any other type that has a non-trivial destructor.
+
+To clarify:
 
 - If `RESULT_TYPE` == `void`, return type == `void`
+- If `RESULT_TYPE` == `std::expected<T, E>`, return type == `std::expected<T, E>`
 - If `RESULT_TYPE` == `std::optional<T>`, return type == `std::optional<T>`
 - If `RESULT_TYPE` == `std::shared_ptr<T>`, return type == `std::shared_ptr<T>`
 - If `RESULT_TYPE` == `std::unique_ptr<T>`, return type == `std::unique_ptr<T>`

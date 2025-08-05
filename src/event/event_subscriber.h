@@ -21,7 +21,7 @@
 #pragma once
 
 
-#include "concepts/subscriber_concepts.h"
+#include "shared/dispatchula_concepts.h"
 
 #include <typeindex>
 #include <vector>

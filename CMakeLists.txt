@@ -8,12 +8,13 @@ add_library(
         dispatchula
 
         INTERFACE
-        src/concepts/subscriber_concepts.h
         src/event/event_dispatcher.h
         src/event/event_subscriber.h
         src/request/request.h
+        src/request/request_concepts.h
         src/request/request_dispatcher.h
         src/request/request_subscriber.h
+        src/shared/dispatchula_concepts.h
 )
 
 target_include_directories(

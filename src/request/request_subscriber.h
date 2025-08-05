@@ -21,9 +21,8 @@
 #pragma once
 
 
-#include "concepts/subscriber_concepts.h"
 #include "request.h"
-
+#include "request_concepts.h"
 
 #include <concepts>
 #include <memory>
@@ -48,7 +47,7 @@ public:
 };
 
 
-template<class REQUEST_TYPE> requires _is_request_return_type_<typename REQUEST_TYPE::_RETURN_TYPE_>
+template<class REQUEST_TYPE> requires _is_non_value_request_return_type_<typename REQUEST_TYPE::_RETURN_TYPE_>
 class _SingleRequestSubscriber_ : virtual public _RequestSubscriberBase_
 {
     friend RequestDispatcher;

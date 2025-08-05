@@ -21,7 +21,7 @@
 #pragma once
 
 
-#include "concepts/subscriber_concepts.h"
+#include "request_concepts.h"
 
 #include <optional>
 #include <type_traits>
@@ -30,24 +30,17 @@
 namespace dispatch {
 
 
-template<typename RAW_RETURN_TYPE>
-struct _GetRequestReturnType_ {
-    using RETURN_TYPE =
-            std::conditional_t<std::is_reference<RAW_RETURN_TYPE>::value, std::nullptr_t,
-                    std::conditional_t<_is_non_value_request_return_type_t_<RAW_RETURN_TYPE>::value, RAW_RETURN_TYPE, std::optional<RAW_RETURN_TYPE>>>;
-};
-
-template<class RAW_RETURN_TYPE, class RETURN_TYPE = typename _GetRequestReturnType_<RAW_RETURN_TYPE>::RETURN_TYPE>
+template<class RETURN_TYPE = void>
 struct Request;
 
-template<class RETURN_TYPE>
-struct Request<RETURN_TYPE, RETURN_TYPE> {
-    using _RETURN_TYPE_ = RETURN_TYPE;
+template<class RETURN_TYPE> requires _is_value_request_return_type_<RETURN_TYPE>
+struct Request<RETURN_TYPE> {
+    using _RETURN_TYPE_ = std::optional<RETURN_TYPE>;
 };
 
-template<class RETURN_TYPE>
-struct Request<RETURN_TYPE, std::optional<RETURN_TYPE>> {
-    using _RETURN_TYPE_ = std::optional<RETURN_TYPE>;
+template<class RETURN_TYPE> requires _is_non_value_request_return_type_<RETURN_TYPE>
+struct Request<RETURN_TYPE> {
+    using _RETURN_TYPE_ = RETURN_TYPE;
 };
 
 
