@@ -33,10 +33,11 @@ namespace dispatch {
 class EventDispatcher;
 
 
-class _EventSubscriberBase_ {
+class _EventSubscriberBase_
+{
     friend EventDispatcher;
 
-    virtual const std::vector<std::type_index> &_d_get_event_type_id_list() = 0;
+    virtual const std::vector<std::type_index>& _get_event_type_id_list() = 0;
 };
 
 
@@ -52,13 +53,11 @@ class _SingleEventSubscriber_ : virtual public _EventSubscriberBase_
 template<class ... EVENT_TYPE_LIST> requires _are_unique_types_<EVENT_TYPE_LIST...>
 class EventSubscriber : public _SingleEventSubscriber_<EVENT_TYPE_LIST>...
 {
-    friend EventDispatcher;
-
-    const std::vector<std::type_index>& _d_get_event_type_id_list() override {
-        return _d_event_type_id_list;
+    const std::vector<std::type_index>& _get_event_type_id_list() override {
+        return _event_type_id_list;
     }
 
-    static inline const std::vector<std::type_index> _d_event_type_id_list = { typeid(EVENT_TYPE_LIST)... };
+    static inline const std::vector<std::type_index> _event_type_id_list = { typeid(EVENT_TYPE_LIST)... };
 };
 
 

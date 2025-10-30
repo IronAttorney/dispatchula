@@ -38,7 +38,7 @@ public:
 
     void subscribe(_EventSubscriberBase_* subscriber)
     {
-        const std::vector<std::type_index>& type_id_list = subscriber->_d_get_event_type_id_list();
+        const std::vector<std::type_index>& type_id_list = subscriber->_get_event_type_id_list();
 
         for (auto type_id : type_id_list) {
             _subscribe_to_type_id(subscriber, type_id);
@@ -53,7 +53,7 @@ public:
 
     void unsubscribe(_EventSubscriberBase_* subscriber)
     {
-        const std::vector<std::type_index>& type_id_list = subscriber->_d_get_event_type_id_list();
+        const std::vector<std::type_index>& type_id_list = subscriber->_get_event_type_id_list();
 
         for (auto type_id : type_id_list) {
             _unsubscribe_from_type_id(subscriber, type_id);

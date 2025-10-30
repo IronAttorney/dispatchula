@@ -5,7 +5,7 @@ SET(CMAKE_CXX_FLAGS)
 add_compile_options(-std=c++23)
 
 add_executable(DispatchulaEventDemo event_demo.cpp)
-target_include_directories(DispatchulaEventDemo PUBLIC src)
+target_include_directories(DispatchulaEventDemo PUBLIC ../src)
 
 add_executable(DispatchulaRequestDemo request_demo.cpp)
 target_include_directories(DispatchulaRequestDemo PUBLIC ../src)
