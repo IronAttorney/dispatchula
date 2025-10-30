@@ -110,7 +110,7 @@ private:
 
 bool RequestDispatcher::subscribe(_RequestSubscriberBase_* subscriber)
 {
-    const auto& type_id_list = subscriber->_d_get_request_type_id_list();
+    const auto& type_id_list = subscriber->_get_request_type_id_list();
 
     bool subscribe_success = true;
 
@@ -123,7 +123,7 @@ bool RequestDispatcher::subscribe(_RequestSubscriberBase_* subscriber)
 
 void RequestDispatcher::unsubscribe(_RequestSubscriberBase_* subscriber)
 {
-    const auto& type_id_list = subscriber->_d_get_request_type_id_list();
+    const auto& type_id_list = subscriber->_get_request_type_id_list();
 
     for (auto type_id : type_id_list) {
         _unsubscribe_from_type_id(subscriber, type_id);

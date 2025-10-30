@@ -40,7 +40,7 @@ class RequestDispatcher;
 class _RequestSubscriberBase_ {
     friend RequestDispatcher;
 
-    virtual const std::vector<std::type_index> &_d_get_request_type_id_list() = 0;
+    virtual const std::vector<std::type_index> &_get_request_type_id_list() = 0;
 
 public:
     virtual ~_RequestSubscriberBase_() = default;
@@ -64,13 +64,11 @@ public:
 template<class ... REQUEST_TYPE_LIST> requires _are_unique_types_<REQUEST_TYPE_LIST...>
 class RequestSubscriber : public _SingleRequestSubscriber_<REQUEST_TYPE_LIST>...
 {
-    friend RequestDispatcher;
-
-    const std::vector<std::type_index>& _d_get_request_type_id_list() override {
-        return _d_request_type_id_list;
+    const std::vector<std::type_index>& _get_request_type_id_list() override {
+        return _request_type_id_list;
     }
 
-    static inline const std::vector<std::type_index> _d_request_type_id_list = {typeid(REQUEST_TYPE_LIST)... };
+    static inline const std::vector<std::type_index> _request_type_id_list = { typeid(REQUEST_TYPE_LIST)... };
 
 public:
     virtual ~RequestSubscriber() = default;
