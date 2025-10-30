@@ -54,18 +54,48 @@ public:
     template<class ... REQUEST_TYPE_LIST, class SUBSCRIBER_TYPE> requires _convertable_to_subscribers_of_<SUBSCRIBER_TYPE, REQUEST_TYPE_LIST...>
     inline void unsubscribe(SUBSCRIBER_TYPE* subscriber);
 
+    /**
+     * Only dispatches to first appropriate subscriber in list
+     *
+     * TODO: Implement dispatch method that dispatches to all appropriate subscribers
+     *  and returns a vector holding every response
+     */
     template<class REQUEST_TYPE> requires _has_void_return_type_<REQUEST_TYPE>
     inline void dispatch(const REQUEST_TYPE& request) const;
 
+    /**
+     * Only dispatches to and returns response from first appropriate subscriber in list
+     *
+     * TODO: Implement dispatch method that dispatches to all appropriate subscribers
+     *  and returns a vector holding every response
+     */
     template<class REQUEST_TYPE> requires _has_expected_return_type_without_string_error_<REQUEST_TYPE>
     inline auto dispatch(const REQUEST_TYPE& request) const -> typename REQUEST_TYPE::_RETURN_TYPE_;
 
+    /**
+     * Only dispatches to and returns response from first appropriate subscriber in list
+     *
+     * TODO: Implement dispatch method that dispatches to all appropriate subscribers
+     *  and returns a vector holding every response
+     */
     template<class REQUEST_TYPE> requires _has_pointer_return_type_<REQUEST_TYPE>
     inline auto dispatch(const REQUEST_TYPE& request) const -> typename REQUEST_TYPE::_RETURN_TYPE_;
 
+    /**
+     * Only dispatches to and returns response from first appropriate subscriber in list
+     *
+     * TODO: Implement dispatch method that dispatches to all appropriate subscribers
+     *  and returns a vector holding every response
+     */
     template<class REQUEST_TYPE> requires _has_optional_return_type_<REQUEST_TYPE>
     inline auto dispatch(const REQUEST_TYPE& request) const -> typename REQUEST_TYPE::_RETURN_TYPE_;
 
+    /**
+     * Only dispatches to and returns response from first appropriate subscriber in list
+     *
+     * TODO: Implement dispatch method that dispatches to all appropriate subscribers
+     *  and returns a vector holding every response
+     */
     template<class REQUEST_TYPE> requires _has_value_return_type_<REQUEST_TYPE>
     inline auto dispatch(const REQUEST_TYPE& request) const -> std::optional<typename REQUEST_TYPE::_RETURN_TYPE_>;
 
@@ -145,6 +175,9 @@ void RequestDispatcher::dispatch(const REQUEST_TYPE& request) const
         return;
     }
 
+    // TODO: Implement dispatch method that dispatches to all appropriate subscribers
+    //  and returns a vector holding every response
+
     const auto& subscriber = request_subscriber_iter->second;
 
     auto sub_subscriber = dynamic_cast<_SingleRequestSubscriber_<REQUEST_TYPE>*>(subscriber);
@@ -164,7 +197,11 @@ auto RequestDispatcher::dispatch(const REQUEST_TYPE& request) const -> typename 
         return std::unexpected(ErrorType{-1});
     }
 
+    // TODO: Implement dispatch method that dispatches to all appropriate subscribers
+    //  and returns a vector holding every response
+
     const auto& subscriber = request_subscriber_iter->second;
+
     auto sub_subscriber = dynamic_cast<_SingleRequestSubscriber_<REQUEST_TYPE>*>(subscriber);
     return sub_subscriber->handle_request(request);
 }
@@ -177,6 +214,9 @@ auto RequestDispatcher::dispatch(const REQUEST_TYPE& request) const -> typename 
     if (request_subscriber_iter == _subscriber_map.end()) {
         return nullptr;
     }
+
+    // TODO: Implement dispatch method that dispatches to all appropriate subscribers
+    //  and returns a vector holding every response
 
     const auto& subscriber = request_subscriber_iter->second;
 
@@ -193,6 +233,9 @@ auto RequestDispatcher::dispatch(const REQUEST_TYPE& request) const -> typename 
         return std::nullopt;
     }
 
+    // TODO: Implement dispatch method that dispatches to all appropriate subscribers
+    //  and returns a vector holding every response
+
     const auto& subscriber = request_subscriber_iter->second;
 
     auto sub_subscriber = dynamic_cast<_SingleRequestSubscriber_<REQUEST_TYPE>*>(subscriber);
@@ -207,6 +250,9 @@ auto RequestDispatcher::dispatch(const REQUEST_TYPE& request) const -> std::opti
     if (request_subscriber_iter == _subscriber_map.end()) {
         return std::nullopt;
     }
+
+    // TODO: Implement dispatch method that dispatches to all appropriate subscribers
+    //  and returns a vector holding every response
 
     const auto& subscriber = request_subscriber_iter->second;
 
