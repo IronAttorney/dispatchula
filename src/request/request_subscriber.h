@@ -34,6 +34,39 @@
 namespace dispatch {
 
 
+/**
+ * All classes wishing to subscribe to requests need to derive from this class.
+ *
+ * Clients should use this class only to derive from when subscribing to requests.
+ *
+ * Refer to `examples/request_demo.cpp` for example usage.
+ *
+ * @tparam REQUEST_TYPE_LIST - is a list of all request types the derived subscribing class
+ *                             will ever wish to subscribe to.
+ */
+template<class ... REQUEST_TYPE_LIST> requires _are_unique_types_<REQUEST_TYPE_LIST...>
+class RequestSubscriber;
+
+/**
+ * A base class used only by the RequestDispatcher to allow subscribing and unsubscribing
+ * to all requests that a subscribing class is subscribed to.
+ *
+ * Clients should not use this class.
+ */
+class _RequestSubscriberBase_;
+
+/**
+ * An intermediate base class used only by RequestSubscriber to help with generating the
+ * request handler functions through template meta-programming.
+ *
+ * Clients should not use this class.
+ *
+ * @tparam REQUEST_TYPE - is a single request type
+ */
+template<class REQUEST_TYPE> requires _is_non_value_request_return_type_<typename REQUEST_TYPE::_RETURN_TYPE_>
+class _SingleRequestSubscriber_;
+
+
 class RequestDispatcher;
 
 

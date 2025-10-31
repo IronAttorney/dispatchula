@@ -30,6 +30,39 @@
 namespace dispatch {
 
 
+/**
+ * All classes wishing to subscribe to events need to derive from this class.
+ *
+ * Clients should use this class only to derive from when subscribing to events,
+ *
+ * Refer to `examples/event_demo.cpp` for example usage.
+ *
+ * @tparam EVENT_TYPE_LIST - is a list of all event types the derived subscribing class
+ *                           will ever wish to subscribe to.
+ */
+template<class ... EVENT_TYPE_LIST> requires _are_unique_types_<EVENT_TYPE_LIST...>
+class EventSubscriber;
+
+/**
+ * A base class used only by the EventDispatcher to allow subscribing and unsubscribing
+ * to all events that a subscribing class is subscribed to.
+ *
+ * Clients should not use this class.
+ */
+class _EventSubscriberBase_;
+
+/**
+ * An intermediate base class used only by EventSubscriber to help with generating the
+ * event handler functions through template meta-programming.
+ *
+ * Clients should not use this class.
+ *
+ * @tparam EVENT_TYPE - is a single event type
+ */
+template<class EVENT_TYPE>
+class _SingleEventSubscriber_;
+
+
 class EventDispatcher;
 
 
