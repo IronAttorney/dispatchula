@@ -61,4 +61,8 @@ class EventSubscriber : public _SingleEventSubscriber_<EVENT_TYPE_LIST>...
 };
 
 
+template<class SINGLE_EVENT_SUBSCRIBER_TYPE, class EVENT_TYPE>
+concept _is_subscriber_for_event_type_ = std::is_base_of_v<_SingleEventSubscriber_<EVENT_TYPE>, SINGLE_EVENT_SUBSCRIBER_TYPE>;
+
+
 } // namespace dispatch
