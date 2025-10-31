@@ -58,7 +58,7 @@ private:
 };
 
 
-void EventDispatcher::subscribe(_EventSubscriberBase_* subscriber)
+inline void EventDispatcher::subscribe(_EventSubscriberBase_* subscriber)
 {
     const std::vector<std::type_index>& type_id_list = subscriber->_get_event_type_id_list();
 
@@ -68,12 +68,12 @@ void EventDispatcher::subscribe(_EventSubscriberBase_* subscriber)
 }
 
 template<class EVENT_TYPE, class SINGLE_EVENT_SUBSCRIBER_TYPE> requires _is_subscriber_for_event_type_<SINGLE_EVENT_SUBSCRIBER_TYPE, EVENT_TYPE>
-void EventDispatcher::subscribe(SINGLE_EVENT_SUBSCRIBER_TYPE* subscriber)
+inline void EventDispatcher::subscribe(SINGLE_EVENT_SUBSCRIBER_TYPE* subscriber)
 {
     _subscribe_to_type_id(subscriber, typeid(EVENT_TYPE));
 }
 
-void EventDispatcher::unsubscribe(_EventSubscriberBase_* subscriber)
+inline void EventDispatcher::unsubscribe(_EventSubscriberBase_* subscriber)
 {
     const std::vector<std::type_index>& type_id_list = subscriber->_get_event_type_id_list();
 
@@ -83,13 +83,13 @@ void EventDispatcher::unsubscribe(_EventSubscriberBase_* subscriber)
 }
 
 template<class EVENT_TYPE, class SINGLE_EVENT_SUBSCRIBER_TYPE> requires _is_subscriber_for_event_type_<SINGLE_EVENT_SUBSCRIBER_TYPE, EVENT_TYPE>
-void EventDispatcher::unsubscribe(SINGLE_EVENT_SUBSCRIBER_TYPE* subscriber)
+inline void EventDispatcher::unsubscribe(SINGLE_EVENT_SUBSCRIBER_TYPE* subscriber)
 {
     _unsubscribe_from_type_id(subscriber, typeid(EVENT_TYPE));
 }
 
 template<class EVENT_TYPE>
-void EventDispatcher::dispatch(const EVENT_TYPE& event) const
+inline void EventDispatcher::dispatch(const EVENT_TYPE& event) const
 {
     const auto event_subscribers_iter = _subscriber_map.find(typeid(event));
 
@@ -105,7 +105,7 @@ void EventDispatcher::dispatch(const EVENT_TYPE& event) const
     }
 }
 
-void EventDispatcher::_subscribe_to_type_id(_EventSubscriberBase_* subscriber, std::type_index type_id)
+inline void EventDispatcher::_subscribe_to_type_id(_EventSubscriberBase_* subscriber, std::type_index type_id)
 {
     auto event_subscribers_iter = _subscriber_map.find(type_id);
 
@@ -119,7 +119,7 @@ void EventDispatcher::_subscribe_to_type_id(_EventSubscriberBase_* subscriber, s
     }
 }
 
-void EventDispatcher::_unsubscribe_from_type_id(_EventSubscriberBase_* subscriber, std::type_index type_id)
+inline void EventDispatcher::_unsubscribe_from_type_id(_EventSubscriberBase_* subscriber, std::type_index type_id)
 {
     auto event_subscribers_iter = _subscriber_map.find(type_id);
 

@@ -38,21 +38,21 @@ class RequestDispatcher {
 
 public:
 
-    inline bool subscribe(_RequestSubscriberBase_* subscriber);
+    bool subscribe(_RequestSubscriberBase_* subscriber);
 
-    inline void unsubscribe(_RequestSubscriberBase_* subscriber);
+    void unsubscribe(_RequestSubscriberBase_* subscriber);
 
     template<class REQUEST_TYPE, class SUBSCRIBER_TYPE> requires _convertable_to_subscriber_of_<SUBSCRIBER_TYPE, REQUEST_TYPE>
-    inline bool subscribe(SUBSCRIBER_TYPE* subscriber);
+    bool subscribe(SUBSCRIBER_TYPE* subscriber);
 
     template<class REQUEST_TYPE, class SUBSCRIBER_TYPE> requires  _convertable_to_subscriber_of_<SUBSCRIBER_TYPE, REQUEST_TYPE>
-    inline void unsubscribe(SUBSCRIBER_TYPE* subscriber);
+    void unsubscribe(SUBSCRIBER_TYPE* subscriber);
 
     template<class ... REQUEST_TYPE_LIST, class SUBSCRIBER_TYPE> requires _convertable_to_subscribers_of_<SUBSCRIBER_TYPE, REQUEST_TYPE_LIST...>
-    inline bool subscribe(SUBSCRIBER_TYPE* subscriber);
+    bool subscribe(SUBSCRIBER_TYPE* subscriber);
 
     template<class ... REQUEST_TYPE_LIST, class SUBSCRIBER_TYPE> requires _convertable_to_subscribers_of_<SUBSCRIBER_TYPE, REQUEST_TYPE_LIST...>
-    inline void unsubscribe(SUBSCRIBER_TYPE* subscriber);
+    void unsubscribe(SUBSCRIBER_TYPE* subscriber);
 
     /**
      * Only dispatches to first appropriate subscriber in list
@@ -61,7 +61,7 @@ public:
      *  and returns a vector holding every response
      */
     template<class REQUEST_TYPE> requires _has_void_return_type_<REQUEST_TYPE>
-    inline void dispatch(const REQUEST_TYPE& request) const;
+    void dispatch(const REQUEST_TYPE& request) const;
 
     /**
      * Only dispatches to and returns response from first appropriate subscriber in list
@@ -70,7 +70,7 @@ public:
      *  and returns a vector holding every response
      */
     template<class REQUEST_TYPE> requires _has_expected_return_type_without_string_error_<REQUEST_TYPE>
-    inline auto dispatch(const REQUEST_TYPE& request) const -> typename REQUEST_TYPE::_RETURN_TYPE_;
+    auto dispatch(const REQUEST_TYPE& request) const -> typename REQUEST_TYPE::_RETURN_TYPE_;
 
     /**
      * Only dispatches to and returns response from first appropriate subscriber in list
@@ -79,7 +79,7 @@ public:
      *  and returns a vector holding every response
      */
     template<class REQUEST_TYPE> requires _has_pointer_return_type_<REQUEST_TYPE>
-    inline auto dispatch(const REQUEST_TYPE& request) const -> typename REQUEST_TYPE::_RETURN_TYPE_;
+    auto dispatch(const REQUEST_TYPE& request) const -> typename REQUEST_TYPE::_RETURN_TYPE_;
 
     /**
      * Only dispatches to and returns response from first appropriate subscriber in list
@@ -88,7 +88,7 @@ public:
      *  and returns a vector holding every response
      */
     template<class REQUEST_TYPE> requires _has_optional_return_type_<REQUEST_TYPE>
-    inline auto dispatch(const REQUEST_TYPE& request) const -> typename REQUEST_TYPE::_RETURN_TYPE_;
+    auto dispatch(const REQUEST_TYPE& request) const -> typename REQUEST_TYPE::_RETURN_TYPE_;
 
     /**
      * Only dispatches to and returns response from first appropriate subscriber in list
@@ -97,18 +97,18 @@ public:
      *  and returns a vector holding every response
      */
     template<class REQUEST_TYPE> requires _has_value_return_type_<REQUEST_TYPE>
-    inline auto dispatch(const REQUEST_TYPE& request) const -> std::optional<typename REQUEST_TYPE::_RETURN_TYPE_>;
+    auto dispatch(const REQUEST_TYPE& request) const -> std::optional<typename REQUEST_TYPE::_RETURN_TYPE_>;
 
 private:
 
-    inline bool _try_subscribe_to_type_id(_RequestSubscriberBase_* subscriber, std::type_index type_id);
-    inline void _unsubscribe_from_type_id(_RequestSubscriberBase_* subscriber, std::type_index type_id);
+    bool _try_subscribe_to_type_id(_RequestSubscriberBase_* subscriber, std::type_index type_id);
+    void _unsubscribe_from_type_id(_RequestSubscriberBase_* subscriber, std::type_index type_id);
 
     std::map<std::type_index, _RequestSubscriberBase_*> _subscriber_map {};
 };
 
 
-bool RequestDispatcher::subscribe(_RequestSubscriberBase_* subscriber)
+inline bool RequestDispatcher::subscribe(_RequestSubscriberBase_* subscriber)
 {
     const auto& type_id_list = subscriber->_get_request_type_id_list();
 
@@ -121,7 +121,7 @@ bool RequestDispatcher::subscribe(_RequestSubscriberBase_* subscriber)
     return subscribe_success;
 }
 
-void RequestDispatcher::unsubscribe(_RequestSubscriberBase_* subscriber)
+inline void RequestDispatcher::unsubscribe(_RequestSubscriberBase_* subscriber)
 {
     const auto& type_id_list = subscriber->_get_request_type_id_list();
 
@@ -131,19 +131,19 @@ void RequestDispatcher::unsubscribe(_RequestSubscriberBase_* subscriber)
 }
 
 template<class REQUEST_TYPE, class SUBSCRIBER_TYPE> requires _convertable_to_subscriber_of_<SUBSCRIBER_TYPE, REQUEST_TYPE>
-bool RequestDispatcher::subscribe(SUBSCRIBER_TYPE* subscriber)
+inline bool RequestDispatcher::subscribe(SUBSCRIBER_TYPE* subscriber)
 {
     return _try_subscribe_to_type_id(subscriber, typeid(REQUEST_TYPE));
 }
 
 template<class REQUEST_TYPE, class SUBSCRIBER_TYPE> requires  _convertable_to_subscriber_of_<SUBSCRIBER_TYPE, REQUEST_TYPE>
-void RequestDispatcher::unsubscribe(SUBSCRIBER_TYPE* subscriber)
+inline void RequestDispatcher::unsubscribe(SUBSCRIBER_TYPE* subscriber)
 {
     return _unsubscribe_from_type_id(subscriber, typeid(REQUEST_TYPE));
 }
 
 template<class ... REQUEST_TYPE_LIST, class SUBSCRIBER_TYPE> requires _convertable_to_subscribers_of_<SUBSCRIBER_TYPE, REQUEST_TYPE_LIST...>
-bool RequestDispatcher::subscribe(SUBSCRIBER_TYPE* subscriber)
+inline bool RequestDispatcher::subscribe(SUBSCRIBER_TYPE* subscriber)
 {
     bool subscribe_success = true;
 
@@ -185,7 +185,7 @@ void RequestDispatcher::dispatch(const REQUEST_TYPE& request) const
 }
 
 template<class REQUEST_TYPE> requires _has_expected_return_type_without_string_error_<REQUEST_TYPE>
-auto RequestDispatcher::dispatch(const REQUEST_TYPE& request) const -> typename REQUEST_TYPE::_RETURN_TYPE_
+inline auto RequestDispatcher::dispatch(const REQUEST_TYPE& request) const -> typename REQUEST_TYPE::_RETURN_TYPE_
 {
     const auto request_subscriber_iter = _subscriber_map.find(typeid(request));
 
@@ -207,7 +207,7 @@ auto RequestDispatcher::dispatch(const REQUEST_TYPE& request) const -> typename 
 }
 
 template<class REQUEST_TYPE> requires _has_pointer_return_type_<REQUEST_TYPE>
-auto RequestDispatcher::dispatch(const REQUEST_TYPE& request) const -> typename REQUEST_TYPE::_RETURN_TYPE_
+inline auto RequestDispatcher::dispatch(const REQUEST_TYPE& request) const -> typename REQUEST_TYPE::_RETURN_TYPE_
 {
     const auto request_subscriber_iter = _subscriber_map.find(typeid(request));
 
@@ -225,7 +225,7 @@ auto RequestDispatcher::dispatch(const REQUEST_TYPE& request) const -> typename 
 }
 
 template<class REQUEST_TYPE> requires _has_optional_return_type_<REQUEST_TYPE>
-auto RequestDispatcher::dispatch(const REQUEST_TYPE& request) const -> typename REQUEST_TYPE::_RETURN_TYPE_
+inline auto RequestDispatcher::dispatch(const REQUEST_TYPE& request) const -> typename REQUEST_TYPE::_RETURN_TYPE_
 {
     const auto request_subscriber_iter = _subscriber_map.find(typeid(request));
 
@@ -243,7 +243,7 @@ auto RequestDispatcher::dispatch(const REQUEST_TYPE& request) const -> typename 
 }
 
 template<class REQUEST_TYPE> requires _has_value_return_type_<REQUEST_TYPE>
-auto RequestDispatcher::dispatch(const REQUEST_TYPE& request) const -> std::optional<typename REQUEST_TYPE::_RETURN_TYPE_>
+inline auto RequestDispatcher::dispatch(const REQUEST_TYPE& request) const -> std::optional<typename REQUEST_TYPE::_RETURN_TYPE_>
 {
     const auto request_subscriber_iter = _subscriber_map.find(typeid(request));
 
@@ -260,13 +260,13 @@ auto RequestDispatcher::dispatch(const REQUEST_TYPE& request) const -> std::opti
     return sub_subscriber->handle_request(request);
 }
 
-bool RequestDispatcher::_try_subscribe_to_type_id(_RequestSubscriberBase_* subscriber, std::type_index type_id)
+inline bool RequestDispatcher::_try_subscribe_to_type_id(_RequestSubscriberBase_* subscriber, std::type_index type_id)
 {
     auto [_, insert_success] = _subscriber_map.try_emplace(type_id, subscriber);
     return insert_success;
 }
 
-void RequestDispatcher::_unsubscribe_from_type_id(_RequestSubscriberBase_* subscriber, std::type_index type_id)
+inline void RequestDispatcher::_unsubscribe_from_type_id(_RequestSubscriberBase_* subscriber, std::type_index type_id)
 {
     _subscriber_map.erase(type_id);
 }
