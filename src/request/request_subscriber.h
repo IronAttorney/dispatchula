@@ -75,8 +75,17 @@ class _RequestSubscriberBase_ {
 
     virtual const std::vector<std::type_index> &_get_request_type_id_list() = 0;
 
-public:
+protected:
+
+    _RequestSubscriberBase_() = default;
     virtual ~_RequestSubscriberBase_() = default;
+
+public:
+
+    _RequestSubscriberBase_(const _RequestSubscriberBase_&) = delete;
+    _RequestSubscriberBase_& operator=(const _RequestSubscriberBase_&) = delete;
+    _RequestSubscriberBase_(_RequestSubscriberBase_&&) = delete;
+    _RequestSubscriberBase_& operator=(_RequestSubscriberBase_&&) = delete;
 };
 
 
@@ -89,8 +98,10 @@ class _SingleRequestSubscriber_ : virtual public _RequestSubscriberBase_
 
     virtual RETURN_TYPE handle_request(const REQUEST_TYPE& dispatch) = 0;
 
-public:
-    virtual ~_SingleRequestSubscriber_() = default;
+protected:
+
+    _SingleRequestSubscriber_() = default;
+    ~_SingleRequestSubscriber_() override = default;
 };
 
 
@@ -102,9 +113,6 @@ class RequestSubscriber : public _SingleRequestSubscriber_<REQUEST_TYPE_LIST>...
     }
 
     static inline const std::vector<std::type_index> _request_type_id_list = { typeid(REQUEST_TYPE_LIST)... };
-
-public:
-    virtual ~RequestSubscriber() = default;
 };
 
 

@@ -24,7 +24,6 @@
 #include "request_concepts.h"
 
 #include <optional>
-#include <type_traits>
 
 
 namespace dispatch {

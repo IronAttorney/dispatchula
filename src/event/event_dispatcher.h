@@ -93,9 +93,8 @@ inline void EventDispatcher::dispatch(const EVENT_TYPE& event) const
 {
     const auto event_subscribers_iter = _subscriber_map.find(typeid(event));
 
-    if (event_subscribers_iter == _subscriber_map.end()) {
+    if (event_subscribers_iter == _subscriber_map.end())
         return;
-    }
 
     const auto& subscriber_list = event_subscribers_iter->second;
 
@@ -123,14 +122,11 @@ inline void EventDispatcher::_unsubscribe_from_type_id(_EventSubscriberBase_* su
 {
     auto event_subscribers_iter = _subscriber_map.find(type_id);
 
-    if (event_subscribers_iter == _subscriber_map.end()) {
+    if (event_subscribers_iter == _subscriber_map.end())
         return;
-    }
 
-    else {
-        auto& subscriber_list = event_subscribers_iter->second;
-        subscriber_list.erase(std::remove(subscriber_list.begin(), subscriber_list.end(), subscriber), subscriber_list.end());
-    }
+    auto& subscriber_list = event_subscribers_iter->second;
+    subscriber_list.erase(std::remove(subscriber_list.begin(), subscriber_list.end(), subscriber), subscriber_list.end());
 }
 
 

@@ -21,20 +21,6 @@ concept _is_expected_ = requires {
     requires std::same_as<T, std::expected<typename T::value_type, typename T::error_type>>;
 };
 
-//template <class T>
-//struct _is_expected_helper_ : std::false_type {};
-//
-//template <class T, class E>
-//struct _is_expected_helper_<std::expected<T, E>> : std::true_type {};
-//
-//template <class T>
-//concept _is_expected_ = _is_expected_helper_<T>::value;
-
-//template<class T>
-//concept _is_expected_ = requires {
-//    []<class U, class E>(const std::expected<U, E>&){}(std::declval<T>());
-//};
-
 template <class T>
 concept _is_raw_pointer_ = std::is_pointer<T>::value;
 

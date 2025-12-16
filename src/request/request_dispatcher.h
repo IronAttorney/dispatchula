@@ -57,8 +57,7 @@ public:
     /**
      * Only dispatches to first appropriate subscriber in list
      *
-     * TODO: Implement dispatch method that dispatches to all appropriate subscribers
-     *  and returns a vector holding every response
+     * TODO: Implement guard against having multiple subscribers as only one subscriber should return a result
      */
     template<class REQUEST_TYPE> requires _has_void_return_type_<REQUEST_TYPE>
     void dispatch(const REQUEST_TYPE& request) const;
@@ -66,8 +65,7 @@ public:
     /**
      * Only dispatches to and returns response from first appropriate subscriber in list
      *
-     * TODO: Implement dispatch method that dispatches to all appropriate subscribers
-     *  and returns a vector holding every response
+     * TODO: Implement guard against having multiple subscribers as only one subscriber should return a result
      */
     template<class REQUEST_TYPE> requires _has_expected_return_type_without_string_error_<REQUEST_TYPE>
     auto dispatch(const REQUEST_TYPE& request) const -> typename REQUEST_TYPE::_RETURN_TYPE_;
@@ -75,8 +73,7 @@ public:
     /**
      * Only dispatches to and returns response from first appropriate subscriber in list
      *
-     * TODO: Implement dispatch method that dispatches to all appropriate subscribers
-     *  and returns a vector holding every response
+     * TODO: Implement guard against having multiple subscribers as only one subscriber should return a result
      */
     template<class REQUEST_TYPE> requires _has_pointer_return_type_<REQUEST_TYPE>
     auto dispatch(const REQUEST_TYPE& request) const -> typename REQUEST_TYPE::_RETURN_TYPE_;
@@ -84,8 +81,7 @@ public:
     /**
      * Only dispatches to and returns response from first appropriate subscriber in list
      *
-     * TODO: Implement dispatch method that dispatches to all appropriate subscribers
-     *  and returns a vector holding every response
+     * TODO: Implement guard against having multiple subscribers as only one subscriber should return a result
      */
     template<class REQUEST_TYPE> requires _has_optional_return_type_<REQUEST_TYPE>
     auto dispatch(const REQUEST_TYPE& request) const -> typename REQUEST_TYPE::_RETURN_TYPE_;
@@ -93,8 +89,7 @@ public:
     /**
      * Only dispatches to and returns response from first appropriate subscriber in list
      *
-     * TODO: Implement dispatch method that dispatches to all appropriate subscribers
-     *  and returns a vector holding every response
+     * TODO: Implement guard against having multiple subscribers as only one subscriber should return a result
      */
     template<class REQUEST_TYPE> requires _has_value_return_type_<REQUEST_TYPE>
     auto dispatch(const REQUEST_TYPE& request) const -> std::optional<typename REQUEST_TYPE::_RETURN_TYPE_>;
@@ -175,8 +170,7 @@ void RequestDispatcher::dispatch(const REQUEST_TYPE& request) const
         return;
     }
 
-    // TODO: Implement dispatch method that dispatches to all appropriate subscribers
-    //  and returns a vector holding every response
+    // TODO: Implement guard against having multiple subscribers as only one subscriber should return a result
 
     const auto& subscriber = request_subscriber_iter->second;
 
@@ -197,8 +191,7 @@ inline auto RequestDispatcher::dispatch(const REQUEST_TYPE& request) const -> ty
         return std::unexpected(ErrorType{-1});
     }
 
-    // TODO: Implement dispatch method that dispatches to all appropriate subscribers
-    //  and returns a vector holding every response
+    // TODO: Implement guard against having multiple subscribers as only one subscriber should return a result
 
     const auto& subscriber = request_subscriber_iter->second;
 
@@ -215,8 +208,7 @@ inline auto RequestDispatcher::dispatch(const REQUEST_TYPE& request) const -> ty
         return nullptr;
     }
 
-    // TODO: Implement dispatch method that dispatches to all appropriate subscribers
-    //  and returns a vector holding every response
+    // TODO: Implement guard against having multiple subscribers as only one subscriber should return a result
 
     const auto& subscriber = request_subscriber_iter->second;
 
@@ -233,8 +225,7 @@ inline auto RequestDispatcher::dispatch(const REQUEST_TYPE& request) const -> ty
         return std::nullopt;
     }
 
-    // TODO: Implement dispatch method that dispatches to all appropriate subscribers
-    //  and returns a vector holding every response
+    // TODO: Implement guard against having multiple subscribers as only one subscriber should return a result
 
     const auto& subscriber = request_subscriber_iter->second;
 
@@ -251,8 +242,7 @@ inline auto RequestDispatcher::dispatch(const REQUEST_TYPE& request) const -> st
         return std::nullopt;
     }
 
-    // TODO: Implement dispatch method that dispatches to all appropriate subscribers
-    //  and returns a vector holding every response
+    // TODO: Implement guard against having multiple subscribers as only one subscriber should return a result
 
     const auto& subscriber = request_subscriber_iter->second;
 

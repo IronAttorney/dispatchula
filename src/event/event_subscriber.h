@@ -71,6 +71,18 @@ class _EventSubscriberBase_
     friend EventDispatcher;
 
     virtual const std::vector<std::type_index>& _get_event_type_id_list() = 0;
+
+protected:
+
+    _EventSubscriberBase_() = default;
+    virtual ~_EventSubscriberBase_() = default;
+
+public:
+
+    _EventSubscriberBase_(const _EventSubscriberBase_&) = delete;
+    _EventSubscriberBase_& operator=(const _EventSubscriberBase_&) = delete;
+    _EventSubscriberBase_(_EventSubscriberBase_&&) = delete;
+    _EventSubscriberBase_& operator=(_EventSubscriberBase_&&) = delete;
 };
 
 
@@ -80,6 +92,11 @@ class _SingleEventSubscriber_ : virtual public _EventSubscriberBase_
     friend EventDispatcher;
 
     virtual void handle_event(const EVENT_TYPE& dispatch) = 0;
+
+protected:
+
+    _SingleEventSubscriber_() = default;
+    ~_SingleEventSubscriber_() override = default;
 };
 
 
