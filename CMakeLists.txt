@@ -9,15 +9,19 @@ add_library(
 
         INTERFACE
 
-        src/event/event_dispatcher.h
-        src/event/event_subscriber.h
+        src/dispatchula_event/event_dispatcher.h
+        src/dispatchula_event/event_subscriber.h
 
-        src/request/request.h
-        src/request/request_concepts.h
-        src/request/request_dispatcher.h
-        src/request/request_subscriber.h
+        src/dispatchula_request/request.h
+        src/dispatchula_request/request_concepts.h
+        src/dispatchula_request/request_dispatcher.h
+        src/dispatchula_request/request_subscriber.h
 
-        src/shared/dispatchula_concepts.h
+        src/dispatchula_shared/dispatchula_concepts.h
+
+        src/dispatchula.h
+        src/dispatchula_event.h
+        src/dispatchula_request.h
 )
 
 target_include_directories(

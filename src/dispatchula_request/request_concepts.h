@@ -5,7 +5,7 @@
 #pragma once
 
 
-#include "shared/dispatchula_concepts.h"
+#include "dispatchula_shared/dispatchula_concepts.h"
 
 
 namespace dispatch {
