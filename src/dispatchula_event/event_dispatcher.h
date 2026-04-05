@@ -100,6 +100,14 @@ inline void EventDispatcher::dispatch(const EVENT_TYPE& event) const
 
     for (auto& subscriber : subscriber_list) {
         auto sub_subscriber = dynamic_cast<_SingleEventSubscriber_<EVENT_TYPE>*>(subscriber);
+
+        if (sub_subscriber == nullptr)
+        {
+            std::cerr << "*** ERROR : EventDispatcher ***" << std::endl;
+            std::cerr << "- An existing subscriber is `dynamic_cast`ing to null... this is almost always caused by a subscriber having gone out of scope or being declared constructed as a temporary" << std::endl;
+            throw;
+        }
+
         sub_subscriber->handle_event(event);
     }
 }
