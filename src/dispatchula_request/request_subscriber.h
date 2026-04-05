@@ -24,8 +24,9 @@
 #include "request.h"
 #include "request_concepts.h"
 
+#include "dispatchula_shared/dispatchula_concepts.h"
+
 #include <concepts>
-#include <memory>
 #include <optional>
 #include <typeindex>
 #include <vector>

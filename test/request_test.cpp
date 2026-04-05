@@ -19,9 +19,7 @@
  */
 
 
-#include "request/request.h"
-#include "request/request_dispatcher.h"
-#include "request/request_subscriber.h"
+#include "dispatchula_request.h"
 
 #include "catch2/catch_test_macros.hpp"
 

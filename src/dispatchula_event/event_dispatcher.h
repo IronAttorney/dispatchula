@@ -24,6 +24,7 @@
 #include "event_subscriber.h"
 
 #include <algorithm>
+#include <iostream>
 #include <map>
 #include <typeindex>
 #include <vector>

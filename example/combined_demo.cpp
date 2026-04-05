@@ -19,11 +19,7 @@
  */
 
 
-#include "event/event_dispatcher.h"
-#include "event/event_subscriber.h"
-#include "request/request.h"
-#include "request/request_dispatcher.h"
-#include "request/request_subscriber.h"
+#include "dispatchula.h"
 
 #include <iostream>
 

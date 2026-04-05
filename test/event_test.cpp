@@ -19,8 +19,7 @@
  */
 
 
-#include "event/event_dispatcher.h"
-#include "event/event_subscriber.h"
+#include "dispatchula_event.h"
 
 #include "catch2/catch_test_macros.hpp"
 

@@ -5,7 +5,8 @@
 #pragma once
 
 
-#include "dispatchula_shared/dispatchula_concepts.h"
+#include <expected>
+#include <type_traits>
 
 
 namespace dispatch {
