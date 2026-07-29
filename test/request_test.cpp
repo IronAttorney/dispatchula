@@ -264,14 +264,41 @@ TEST_CASE("Test request with string return type returns value wrapped in `std::o
 
 /// Single subscriber tests
 
-TEST_CASE("Test request not handled before SingleSubscriber is subscribed to anything")
+TEST_CASE("Test SingleSubscriber subscribes successfully to requests generally")
 {
     using namespace dispatch;
 
     RequestDispatcher request_dispatcher;
     SingleSubscriber subscriber;
 
+    const bool did_subscribe = request_dispatcher.subscribe(&subscriber);
+
+    REQUIRE(did_subscribe);
+}
+
+TEST_CASE("Test first SingleSubscriber subscribes successfully to requests in general but second SingleSubscriber fails to subscribe to requests generally")
+{
+    using namespace dispatch;
+
+    RequestDispatcher request_dispatcher;
+    SingleSubscriber subscriber_0;
+    SingleSubscriber subscriber_1;
+
+    const bool did_subscribe_0 = request_dispatcher.subscribe(&subscriber_0);
+    const bool did_subscribe_1 = request_dispatcher.subscribe(&subscriber_1);
+
+    REQUIRE(did_subscribe_0);
+    REQUIRE_FALSE(did_subscribe_1);
+}
+
+TEST_CASE("Test request not handled before SingleSubscriber is subscribed to anything")
+{
+    using namespace dispatch;
+
+    RequestDispatcher request_dispatcher;
+    SingleSubscriber subscriber;
     ReadBackMyDataRequest request { .data = 12345 };
+
     auto result = request_dispatcher.dispatch(request);
 
     REQUIRE(result.has_value() == false);
@@ -283,8 +310,8 @@ TEST_CASE("Test request handled after SingleSubscriber is subscribed to requests
 
     RequestDispatcher request_dispatcher;
     SingleSubscriber subscriber;
-
     ReadBackMyDataRequest request { .data = 12345 };
+
     request_dispatcher.subscribe(&subscriber);
     auto result = request_dispatcher.dispatch(request);
 
@@ -298,8 +325,8 @@ TEST_CASE("Test request not handled after SingleSubscriber is subscribed to and 
 
     RequestDispatcher request_dispatcher;
     SingleSubscriber subscriber;
-
     ReadBackMyDataRequest request { .data = 12345 };
+
     request_dispatcher.subscribe(&subscriber);
     request_dispatcher.unsubscribe(&subscriber);
     auto result = request_dispatcher.dispatch(request);
@@ -313,8 +340,8 @@ TEST_CASE("Test request handled after SingleSubscriber is subscribed to the spec
 
     RequestDispatcher request_dispatcher;
     SingleSubscriber subscriber;
-
     ReadBackMyDataRequest request { .data = 12345 };
+
     request_dispatcher.subscribe<ReadBackMyDataRequest>(&subscriber);
     auto result = request_dispatcher.dispatch(request);
 
@@ -328,8 +355,8 @@ TEST_CASE("Test request not handled after SingleSubscriber is subscribed to and 
 
     RequestDispatcher request_dispatcher;
     SingleSubscriber subscriber;
-
     ReadBackMyDataRequest request { .data = 12345 };
+
     request_dispatcher.subscribe<ReadBackMyDataRequest>(&subscriber);
     request_dispatcher.unsubscribe<ReadBackMyDataRequest>(&subscriber);
     auto result = request_dispatcher.dispatch(request);
@@ -343,8 +370,8 @@ TEST_CASE("Test request not handled after SingleSubscriber is subscribed to requ
 
     RequestDispatcher request_dispatcher;
     SingleSubscriber subscriber;
-
     ReadBackMyDataRequest request { .data = 12345 };
+
     request_dispatcher.subscribe(&subscriber);
     request_dispatcher.unsubscribe<ReadBackMyDataRequest>(&subscriber);
     auto result = request_dispatcher.dispatch(request);
@@ -358,13 +385,84 @@ TEST_CASE("Test request not handled after SingleSubscriber is subscribed to the 
 
     RequestDispatcher request_dispatcher;
     SingleSubscriber subscriber;
-
     ReadBackMyDataRequest request { .data = 12345 };
+
     request_dispatcher.subscribe<ReadBackMyDataRequest>(&subscriber);
     request_dispatcher.unsubscribe(&subscriber);
     auto result = request_dispatcher.dispatch(request);
 
     REQUIRE(result.has_value() == false);
+}
+
+
+/// SingleSubscriber tests for when a one subscriber is subscribed, and a different subscriber tries to unsubscribe from the same request type
+
+TEST_CASE("Test request handled by first SingleSubscribers to subscribe to request generally after a different SingleSubscriber tries to unsubscribe from requests generally")
+{
+    using namespace dispatch;
+
+    RequestDispatcher request_dispatcher;
+    SingleSubscriber subscriber_0;
+    SingleSubscriber subscriber_1;
+    ReadBackMyDataRequest request { .data = 12345 };
+
+    request_dispatcher.subscribe(&subscriber_0);
+    request_dispatcher.unsubscribe(&subscriber_1);
+    const auto result = request_dispatcher.dispatch(request);
+
+    REQUIRE(result.has_value());
+    REQUIRE(result.value() == "12345");
+}
+
+TEST_CASE("Test request handled by first SingleSubscribers to subscribe to request generally after a different SingleSubscriber tries to unsubscribe from the specific request type it handles")
+{
+    using namespace dispatch;
+
+    RequestDispatcher request_dispatcher;
+    SingleSubscriber subscriber_0;
+    SingleSubscriber subscriber_1;
+    ReadBackMyDataRequest request { .data = 12345 };
+
+    request_dispatcher.subscribe(&subscriber_0);
+    request_dispatcher.unsubscribe<ReadBackMyDataRequest>(&subscriber_1);
+    const auto result = request_dispatcher.dispatch(request);
+
+    REQUIRE(result.has_value());
+    REQUIRE(result.value() == "12345");
+}
+
+TEST_CASE("Test request handled by first SingleSubscribers to subscribe to the specific request type it handles after a different SingleSubscriber tries to unsubscribe from requests generally")
+{
+    using namespace dispatch;
+
+    RequestDispatcher request_dispatcher;
+    SingleSubscriber subscriber_0;
+    SingleSubscriber subscriber_1;
+    ReadBackMyDataRequest request { .data = 12345 };
+
+    request_dispatcher.subscribe<ReadBackMyDataRequest>(&subscriber_0);
+    request_dispatcher.subscribe(&subscriber_1);
+    const auto result = request_dispatcher.dispatch(request);
+
+    REQUIRE(result.has_value());
+    REQUIRE(result.value() == "12345");
+}
+
+TEST_CASE("Test request handled by first SingleSubscribers to subscribe to the specific request type it handles after a different SingleSubscriber tries to unsubscribe from the specific request type it handles")
+{
+    using namespace dispatch;
+
+    RequestDispatcher request_dispatcher;
+    SingleSubscriber subscriber_0;
+    SingleSubscriber subscriber_1;
+    ReadBackMyDataRequest request { .data = 12345 };
+
+    request_dispatcher.subscribe<ReadBackMyDataRequest>(&subscriber_0);
+    request_dispatcher.unsubscribe<ReadBackMyDataRequest>(&subscriber_1);
+    const auto result = request_dispatcher.dispatch(request);
+
+    REQUIRE(result.has_value());
+    REQUIRE(result.value() == "12345");
 }
 
 
@@ -376,8 +474,8 @@ TEST_CASE("Test request with no return type handled")
 
     RequestDispatcher request_dispatcher;
     MultiSubscriber subscriber;
-
     DoSomethingRequest request {};
+
     request_dispatcher.subscribe(&subscriber);
     request_dispatcher.dispatch(request);
 
@@ -390,8 +488,8 @@ TEST_CASE("Test request with value return type handled")
 
     RequestDispatcher request_dispatcher;
     MultiSubscriber subscriber;
-
     GiveMeStuffRequest request {};
+
     request_dispatcher.subscribe(&subscriber);
     auto result = request_dispatcher.dispatch(request);
 
@@ -405,8 +503,8 @@ TEST_CASE("Test request with object return type handled")
 
     RequestDispatcher request_dispatcher;
     MultiSubscriber subscriber;
-
     GiveMeAnObjectRequest request {};
+
     request_dispatcher.subscribe(&subscriber);
     auto result = request_dispatcher.dispatch(request);
 
@@ -420,8 +518,8 @@ TEST_CASE("Test request with `std::optional` return type handled")
 
     RequestDispatcher request_dispatcher;
     MultiSubscriber subscriber;
-
     GiveMeStuffIfYouLikeRequest request {};
+
     request_dispatcher.subscribe(&subscriber);
     auto result = request_dispatcher.dispatch(request);
 
@@ -435,8 +533,8 @@ TEST_CASE("Test request with `std::expected` return type handled")
 
     RequestDispatcher request_dispatcher;
     MultiSubscriber subscriber;
-
     GiveMeExpectedStuffOrErrorRequest request {};
+
     request_dispatcher.subscribe(&subscriber);
     auto result = request_dispatcher.dispatch(request);
 
@@ -450,8 +548,8 @@ TEST_CASE("Test request with `std::shared_ptr` return type handled")
 
     RequestDispatcher request_dispatcher;
     MultiSubscriber subscriber;
-
     GiveMePointersRequest request {};
+
     request_dispatcher.subscribe(&subscriber);
     auto result = request_dispatcher.dispatch(request);
 
@@ -465,8 +563,8 @@ TEST_CASE("Test request with `std::unique_ptr` return type handled")
 
     RequestDispatcher request_dispatcher;
     MultiSubscriber subscriber;
-
     GiveMeUniquePointersRequest request {};
+
     request_dispatcher.subscribe(&subscriber);
     auto result = request_dispatcher.dispatch(request);
 
@@ -480,8 +578,8 @@ TEST_CASE("Test request with raw pointer return type handled")
 
     RequestDispatcher request_dispatcher;
     MultiSubscriber subscriber;
-
     GiveMeRawPointersRequest request {};
+
     request_dispatcher.subscribe(&subscriber);
     auto result = request_dispatcher.dispatch(request);
 
@@ -495,8 +593,8 @@ TEST_CASE("Test request with string return type handled")
 
     RequestDispatcher request_dispatcher;
     MultiSubscriber subscriber;
-
     ReadBackMyDataRequest request { .data = 12345 };
+
     request_dispatcher.subscribe(&subscriber);
     auto result = request_dispatcher.dispatch(request);
 
@@ -512,8 +610,8 @@ TEST_CASE("Test request with value return type returns `std:::nullopt` when no s
     using namespace dispatch;
 
     RequestDispatcher request_dispatcher;
-
     GiveMeStuffRequest request {};
+
     auto result = request_dispatcher.dispatch(request);
 
     REQUIRE(result.has_value() == false);
@@ -524,8 +622,8 @@ TEST_CASE("Test request with object return type returns `std:::nullopt` when no 
     using namespace dispatch;
 
     RequestDispatcher request_dispatcher;
-
     GiveMeAnObjectRequest request {};
+
     auto result = request_dispatcher.dispatch(request);
 
     REQUIRE(result.has_value() == false);
@@ -536,8 +634,8 @@ TEST_CASE("Test request with `std::optional` return type returns `std:::nullopt`
     using namespace dispatch;
 
     RequestDispatcher request_dispatcher;
-
     GiveMeStuffIfYouLikeRequest request {};
+
     auto result = request_dispatcher.dispatch(request);
 
     REQUIRE(result.has_value() == false);
@@ -548,8 +646,8 @@ TEST_CASE("Test request with `std::expected` return type returns error when no s
     using namespace dispatch;
 
     RequestDispatcher request_dispatcher;
-
     GiveMeExpectedStuffOrErrorRequest request {};
+
     auto result = request_dispatcher.dispatch(request);
 
     REQUIRE(result.has_value() == false);
@@ -561,8 +659,8 @@ TEST_CASE("Test request with `std::shared_ptr` return type returns `nullptr` whe
     using namespace dispatch;
 
     RequestDispatcher request_dispatcher;
-
     GiveMePointersRequest request {};
+
     auto result = request_dispatcher.dispatch(request);
 
     REQUIRE(result == nullptr);
@@ -573,8 +671,8 @@ TEST_CASE("Test request with `std::unique_ptr` return type returns `nullptr` whe
     using namespace dispatch;
 
     RequestDispatcher request_dispatcher;
-
     GiveMeUniquePointersRequest request {};
+
     auto result = request_dispatcher.dispatch(request);
 
     REQUIRE(result == nullptr);
@@ -585,8 +683,8 @@ TEST_CASE("Test request with raw pointer return type returns `nullptr` when no s
     using namespace dispatch;
 
     RequestDispatcher request_dispatcher;
-
     GiveMeRawPointersRequest request {};
+
     auto result = request_dispatcher.dispatch(request);
 
     REQUIRE(result == nullptr);
@@ -597,8 +695,8 @@ TEST_CASE("Test request with string return type returns `std::nullopt` when no s
     using namespace dispatch;
 
     RequestDispatcher request_dispatcher;
-
     ReadBackMyDataRequest request { .data = 12345 };
+
     auto result = request_dispatcher.dispatch(request);
 
     REQUIRE(result.has_value() == false);

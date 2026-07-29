@@ -26,6 +26,7 @@
 #include <map>
 #include <optional>
 #include <typeindex>
+#include <unordered_map>
 #include <vector>
 
 
@@ -40,54 +41,71 @@ public:
 
     void unsubscribe(_RequestSubscriberBase_* subscriber);
 
+    /**
+     * Only allows one subscriber per `REQUEST_TYPE` at a time.
+     *
+     * Returns `true` if subscription is successful.
+     * Returns `false` if a subscriber already exists or subscription fails for any other reason.
+     */
     template<class REQUEST_TYPE, class SUBSCRIBER_TYPE> requires _convertable_to_subscriber_of_<SUBSCRIBER_TYPE, REQUEST_TYPE>
     bool subscribe(SUBSCRIBER_TYPE* subscriber);
 
-    template<class REQUEST_TYPE, class SUBSCRIBER_TYPE> requires  _convertable_to_subscriber_of_<SUBSCRIBER_TYPE, REQUEST_TYPE>
+    /**
+     * Can be called by any request subscriber even if they are not currently subscribed to `REQUEST_TYPE`.
+     *
+     * Always succeeds whether `subscriber` is currently subscribed or not without causing issue or raising an error.
+     */
+    template <class REQUEST_TYPE, class SUBSCRIBER_TYPE> requires  _convertable_to_subscriber_of_<SUBSCRIBER_TYPE, REQUEST_TYPE>
     void unsubscribe(SUBSCRIBER_TYPE* subscriber);
 
+    /**
+     * Only allows one subscriber per request type from the `REQUEST_TYPE_LIST` at a time.
+     *
+     * Returns a map of which request types were successfully subscribed.
+     *
+     * Request types in the map are represented by `std::type_index`, which are used as keys into the map.
+     * Use `typeid(REQUEST_TYPE)` to check if a specific request type was subscribed to or not.
+     *
+     * Returns `true` if subscription is successful per request type represented by `std::type_index`.
+     * Returns `false` if a subscriber already exists or subscription fails for any other reason per request type represented by `std::type_index`.
+     */
     template<class ... REQUEST_TYPE_LIST, class SUBSCRIBER_TYPE> requires _convertable_to_subscribers_of_<SUBSCRIBER_TYPE, REQUEST_TYPE_LIST...>
-    bool subscribe(SUBSCRIBER_TYPE* subscriber);
+    std::unordered_map<std::type_index, bool> subscribe(SUBSCRIBER_TYPE* subscriber);
 
+    /**
+     * Can be called by any request subscriber even if they are not currently subscribed to some of the `REQUEST_TYPE_LIST`.
+     *
+     * Always succeeds whether `subscriber` is currently subscribed or not without causing issue or raising an error.
+     */
     template<class ... REQUEST_TYPE_LIST, class SUBSCRIBER_TYPE> requires _convertable_to_subscribers_of_<SUBSCRIBER_TYPE, REQUEST_TYPE_LIST...>
     void unsubscribe(SUBSCRIBER_TYPE* subscriber);
 
     /**
-     * Only dispatches to first appropriate subscriber in list
-     *
-     * TODO: Implement guard against having multiple subscribers as only one subscriber should return a result
+     * Only dispatches to and returns results from a single subscriber
      */
     template<class REQUEST_TYPE> requires _has_void_return_type_<REQUEST_TYPE>
     void dispatch(const REQUEST_TYPE& request) const;
 
     /**
-     * Only dispatches to and returns response from first appropriate subscriber in list
-     *
-     * TODO: Implement guard against having multiple subscribers as only one subscriber should return a result
+     * Only dispatches to and returns results from a single subscriber
      */
     template<class REQUEST_TYPE> requires _has_expected_return_type_without_string_error_<REQUEST_TYPE>
     auto dispatch(const REQUEST_TYPE& request) const -> typename REQUEST_TYPE::_RETURN_TYPE_;
 
     /**
-     * Only dispatches to and returns response from first appropriate subscriber in list
-     *
-     * TODO: Implement guard against having multiple subscribers as only one subscriber should return a result
+     * Only dispatches to and returns results from a single subscriber
      */
     template<class REQUEST_TYPE> requires _has_pointer_return_type_<REQUEST_TYPE>
     auto dispatch(const REQUEST_TYPE& request) const -> typename REQUEST_TYPE::_RETURN_TYPE_;
 
     /**
-     * Only dispatches to and returns response from first appropriate subscriber in list
-     *
-     * TODO: Implement guard against having multiple subscribers as only one subscriber should return a result
+     * Only dispatches to and returns results from a single subscriber
      */
     template<class REQUEST_TYPE> requires _has_optional_return_type_<REQUEST_TYPE>
     auto dispatch(const REQUEST_TYPE& request) const -> typename REQUEST_TYPE::_RETURN_TYPE_;
 
     /**
-     * Only dispatches to and returns response from first appropriate subscriber in list
-     *
-     * TODO: Implement guard against having multiple subscribers as only one subscriber should return a result
+     * Only dispatches to and returns results from a single subscriber
      */
     template<class REQUEST_TYPE> requires _has_value_return_type_<REQUEST_TYPE>
     auto dispatch(const REQUEST_TYPE& request) const -> std::optional<typename REQUEST_TYPE::_RETURN_TYPE_>;
@@ -136,17 +154,18 @@ inline void RequestDispatcher::unsubscribe(SUBSCRIBER_TYPE* subscriber)
 }
 
 template<class ... REQUEST_TYPE_LIST, class SUBSCRIBER_TYPE> requires _convertable_to_subscribers_of_<SUBSCRIBER_TYPE, REQUEST_TYPE_LIST...>
-inline bool RequestDispatcher::subscribe(SUBSCRIBER_TYPE* subscriber)
+inline std::unordered_map<std::type_index, bool> RequestDispatcher::subscribe(SUBSCRIBER_TYPE* subscriber)
 {
-    bool subscribe_success = true;
+    std::unordered_map<std::type_index, bool> subscribe_success_map;
+    subscribe_success_map.reserve(sizeof...(REQUEST_TYPE_LIST));
 
     const std::vector<std::type_index> _d_request_type_id_list = { typeid(REQUEST_TYPE_LIST)... };
 
     for (auto type_id : _d_request_type_id_list) {
-        subscribe_success &= _try_subscribe_to_type_id(subscriber, type_id);
+        subscribe_success_map[type_id] &= _try_subscribe_to_type_id(subscriber, type_id);
     }
 
-    return subscribe_success;
+    return subscribe_success_map;
 }
 
 template<class ... REQUEST_TYPE_LIST, class SUBSCRIBER_TYPE> requires _convertable_to_subscribers_of_<SUBSCRIBER_TYPE, REQUEST_TYPE_LIST...>
@@ -167,8 +186,6 @@ void RequestDispatcher::dispatch(const REQUEST_TYPE& request) const
     if (request_subscriber_iter == _subscriber_map.end()) {
         return;
     }
-
-    // TODO: Implement guard against having multiple subscribers as only one subscriber should return a result
 
     const auto& subscriber = request_subscriber_iter->second;
 
@@ -256,7 +273,15 @@ inline bool RequestDispatcher::_try_subscribe_to_type_id(_RequestSubscriberBase_
 
 inline void RequestDispatcher::_unsubscribe_from_type_id(_RequestSubscriberBase_* subscriber, std::type_index type_id)
 {
-    _subscriber_map.erase(type_id);
+    const auto request_subscriber_iter = _subscriber_map.find(type_id);
+
+    if (request_subscriber_iter == _subscriber_map.end())
+        return;
+
+    if (request_subscriber_iter->second != subscriber)
+        return;
+
+    _subscriber_map.erase(request_subscriber_iter);
 }
 
 
